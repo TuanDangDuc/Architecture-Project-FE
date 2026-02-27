@@ -41,16 +41,22 @@ export default function AdminPostEditor() {
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setPostInfo({...postInfo, thumbnail: imageUrl});
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPostInfo({...postInfo, thumbnail: reader.result as string});
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setPostInfo({...postInfo, thumbnail: imageUrl});
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPostInfo({...postInfo, thumbnail: reader.result as string});
+      };
+      reader.readAsDataURL(file);
     }
   };
 

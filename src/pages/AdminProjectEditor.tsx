@@ -44,18 +44,22 @@ export default function AdminProjectEditor() {
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      // In a real app, you would upload this file to a server here.
-      // For now, we'll create a local object URL to preview it.
-      const imageUrl = URL.createObjectURL(file);
-      setProjectInfo({...projectInfo, thumbnail: imageUrl});
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProjectInfo({...projectInfo, thumbnail: reader.result as string});
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setProjectInfo({...projectInfo, thumbnail: imageUrl});
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProjectInfo({...projectInfo, thumbnail: reader.result as string});
+      };
+      reader.readAsDataURL(file);
     }
   };
 

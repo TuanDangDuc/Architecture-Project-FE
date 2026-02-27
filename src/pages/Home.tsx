@@ -3,7 +3,6 @@ import { ArrowRight, CheckCircle2, Home as HomeIcon, Building, TreePine, Sofa, A
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Logo from "../components/Logo";
-import Logo2 from "../components/Logo2";
 
 const services = [
   { icon: HomeIcon, title: "Nhà phố", desc: "Tối ưu không gian sống đô thị" },
@@ -52,7 +51,7 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-8"
           >
-            <Logo2 className="w-45 h-45 text-white mx-auto drop-shadow-lg" />
+            <Logo className="w-32 h-32 text-white mx-auto drop-shadow-lg" />
           </motion.div>
 
           <motion.h1 

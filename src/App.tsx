@@ -16,10 +16,12 @@ import CompanyProfile from "./pages/CompanyProfile";
 import Posts from "./pages/Posts";
 import PostDetail from "./pages/PostDetail";
 import Videos from "./pages/Videos";
+import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />

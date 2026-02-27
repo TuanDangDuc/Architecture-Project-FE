@@ -304,8 +304,8 @@ export default function ProjectDetail() {
                 </Link>
               </div>
               
-              <a href="tel:0909123456" className="flex items-center justify-center w-full py-3 bg-white text-[var(--color-wood)] border border-[var(--color-wood)] text-center font-medium rounded-xl hover:bg-[var(--color-beige)] transition-colors">
-                <Phone size={18} className="mr-2" /> Gọi hotline: 0909 123 456
+              <a href="tel:0356210970" className="flex items-center justify-center w-full py-3 bg-white text-[var(--color-wood)] border border-[var(--color-wood)] text-center font-medium rounded-xl hover:bg-[var(--color-beige)] transition-colors">
+                <Phone size={18} className="mr-2" /> Gọi hotline: 035 621 0970
               </a>
             </div>
           </div>

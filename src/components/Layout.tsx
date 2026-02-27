@@ -149,7 +149,7 @@ export default function Layout() {
                 <h3 className="text-2xl font-serif font-black text-[var(--color-wood)] tracking-widest uppercase">MAI HUONG <span className="font-light">ARC</span></h3>
               </div>
               <p className="text-sm opacity-80 leading-relaxed max-w-sm">
-                Kiến tạo không gian sống hoàn mỹ, nâng tầm phong cách sống với những thiết kế tinh tế, hiện đại và đậm chất riêng.
+                TƯ VẤN- THIẾT KẾ- THI CÔNG XÂY DỰNG
               </p>
             </div>
             <div>
@@ -157,15 +157,15 @@ export default function Layout() {
               <ul className="space-y-4">
                 <li className="flex items-start space-x-3 text-sm opacity-80">
                   <MapPin size={18} className="text-[var(--color-wood)] shrink-0 mt-0.5" />
-                  <span>123 Đường Kiến Trúc, Quận 1, TP.HCM</span>
+                  <span>46 Võ trường Toản , Phường 08, Tp. Đà lạt, Đà Lạt, Vietnam</span>
                 </li>
                 <li className="flex items-center space-x-3 text-sm opacity-80">
                   <Phone size={18} className="text-[var(--color-wood)] shrink-0" />
-                  <span>0909 123 456</span>
+                  <span>035 621 0970</span>
                 </li>
                 <li className="flex items-center space-x-3 text-sm opacity-80">
                   <Mail size={18} className="text-[var(--color-wood)] shrink-0" />
-                  <span>contact@maihuongarc.com</span>
+                  <span>maihuongarchitects@gmail.com</span>
                 </li>
               </ul>
             </div>
@@ -195,7 +195,7 @@ export default function Layout() {
 
       {/* Floating Contact */}
       <div className="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
-        <a href="tel:0909123456" className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+        <a href="tel:0356210970" className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
           <Phone size={20} />
         </a>
         <a href="#" className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">

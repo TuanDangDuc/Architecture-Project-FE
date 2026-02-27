@@ -72,7 +72,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-charcoal)]/50 mb-1">Địa chỉ văn phòng</h4>
-                    <p className="text-[var(--color-charcoal)] font-medium text-lg">123 Đường Kiến Trúc, Quận 1, TP.HCM</p>
+                    <p className="text-[var(--color-charcoal)] font-medium text-lg">46 Võ trường Toản , Phường 08, Tp. Đà lạt, Đà Lạt, Vietnam</p>
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -81,7 +81,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-charcoal)]/50 mb-1">Hotline tư vấn</h4>
-                    <a href="tel:0909123456" className="text-[var(--color-charcoal)] font-medium text-lg hover:text-[var(--color-gold)] transition-colors">0909 123 456</a>
+                    <a href="tel:0356210970" className="text-[var(--color-charcoal)] font-medium text-lg hover:text-[var(--color-gold)] transition-colors">035 621 0970</a>
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -90,7 +90,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-charcoal)]/50 mb-1">Email</h4>
-                    <a href="mailto:contact@webarchitect.com" className="text-[var(--color-charcoal)] font-medium text-lg hover:text-[var(--color-gold)] transition-colors">contact@webarchitect.com</a>
+                    <a href="mailto:maihuongarchitects@gmail.com" className="text-[var(--color-charcoal)] font-medium text-lg hover:text-[var(--color-gold)] transition-colors">maihuongarchitects@gmail.com</a>
                   </div>
                 </li>
                 <li className="flex items-start">

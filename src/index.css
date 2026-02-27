@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  
+  --color-cream: #FDFBF7;
+  --color-beige: #F0EBE1;
+  --color-wood: #7B1E1A; /* Deep Red from logo */
+  --color-gold: #9E2A25; /* Lighter Red for hover/accents */
+  --color-charcoal: #111A22; /* Dark Navy/Black from text */
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-charcoal);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
+
+/* Base styles for GrapesJS content to counter Tailwind's preflight reset */
+.grapesjs-content-wrapper {
+  color: var(--color-charcoal);
+  line-height: 1.6;
+}
+
+.grapesjs-content-wrapper p {
+  margin-bottom: 1em;
+}
+
+.grapesjs-content-wrapper h1, 
+.grapesjs-content-wrapper h2, 
+.grapesjs-content-wrapper h3, 
+.grapesjs-content-wrapper h4, 
+.grapesjs-content-wrapper h5, 
+.grapesjs-content-wrapper h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.grapesjs-content-wrapper h1 { font-size: 2.5em; }
+.grapesjs-content-wrapper h2 { font-size: 2em; }
+.grapesjs-content-wrapper h3 { font-size: 1.75em; }
+.grapesjs-content-wrapper h4 { font-size: 1.5em; }
+
+.grapesjs-content-wrapper ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.grapesjs-content-wrapper ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.grapesjs-content-wrapper a {
+  color: var(--color-wood);
+  text-decoration: underline;
+}
+
+.grapesjs-content-wrapper img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* GrapesJS Builder Global Styles */
+.article-title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--color-wood);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.article-text {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--color-charcoal);
+  opacity: 0.85;
+  margin-bottom: 1.5rem;
+}
+
+.article-image {
+  width: 100%;
+  border-radius: 1rem;
+  margin: 2rem 0;
+  object-fit: cover;
+  aspect-ratio: 16/9;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.article-quote {
+  background-color: var(--color-beige);
+  padding: 3rem 2rem;
+  border-radius: 1rem;
+  margin: 3rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.quote-icon {
+  color: var(--color-gold);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.quote-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-wood);
+  margin-bottom: 1.5rem;
+}
+
+.quote-text {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-style: italic;
+  line-height: 1.8;
+  color: var(--color-charcoal);
+  margin-bottom: 1.5rem;
+}
+
+.quote-author {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+}
+

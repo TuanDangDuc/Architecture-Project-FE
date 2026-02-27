@@ -15,7 +15,7 @@ export default function Layout() {
           <div className="flex justify-between h-20">
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-3">
-                <Logo className="w-10 h-10 text-[var(--color-wood)]" />
+                <Logo className="w-13 h-13 text-[var(--color-wood)]" />
                 <span className="text-2xl font-serif font-black text-[var(--color-wood)] tracking-widest uppercase hidden sm:block">
                   MAI HUONG <span className="font-light">ARC</span>
                 </span>
@@ -145,7 +145,7 @@ export default function Layout() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
               <div className="flex items-center space-x-3 mb-6">
-                <Logo className="w-10 h-10 text-[var(--color-wood)]" />
+                <Logo className="w-13 h-13 text-[var(--color-wood)]" />
                 <h3 className="text-2xl font-serif font-black text-[var(--color-wood)] tracking-widest uppercase">MAI HUONG <span className="font-light">ARC</span></h3>
               </div>
               <p className="text-sm opacity-80 leading-relaxed max-w-sm">

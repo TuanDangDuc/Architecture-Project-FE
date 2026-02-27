@@ -4,6 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Google AI Studio App</title>
+    <link rel="icon" type="image/png" href="/logo.png" id="favicon" sizes="192x192" />
+    <script>
+      // Convert favicon to white
+      const favicon = document.getElementById('favicon');
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * 2;
+        canvas.height = img.height * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        // Convert to white for non-transparent pixels
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] > 128) { // if alpha > 50%
+            data[i] = 255;     // R
+            data[i + 1] = 255; // G
+            data[i + 2] = 255; // B
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        favicon.href = canvas.toDataURL('image/png');
+      };
+      img.src = '/logo.png';
+    </script>
   </head>
   <body>
     <div id="root"></div>

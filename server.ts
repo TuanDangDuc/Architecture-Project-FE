@@ -140,7 +140,7 @@ if (projectCount.count === 0) {
     "Thiết kế biệt thự phố với không gian mở, hồ bơi vô cực và sân vườn trên mái.", 
     "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
     "[]",
-    <style>
+    `<style>
       .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
       .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
       .article-image { width: 100%; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }

@@ -92,6 +92,12 @@ export default function Portfolio() {
                       </div>
                       <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
                       
+                      {project.gallery && project.gallery.length > 0 && (
+                        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center z-20">
+                          +{project.gallery.length} ảnh
+                        </div>
+                      )}
+                      
                       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white/95 via-white/80 to-white/0 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 flex flex-col items-center text-center">
                         <span className="inline-block px-4 py-1 bg-white/50 backdrop-blur-md text-[var(--color-charcoal)] text-xs font-bold tracking-wider uppercase rounded-full mb-2 shadow-sm">
                           {project.category}

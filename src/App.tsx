@@ -12,11 +12,14 @@ import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import AdminProjectEditor from "./pages/AdminProjectEditor";
 import AdminPostEditor from "./pages/AdminPostEditor";
+import AdminVideoEditor from "./pages/AdminVideoEditor";
 import CompanyProfile from "./pages/CompanyProfile";
 import Posts from "./pages/Posts";
 import PostDetail from "./pages/PostDetail";
 import Videos from "./pages/Videos";
+import Login from "./pages/Login";
 import ScrollToTop from "./components/ScrollToTop";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -33,9 +36,15 @@ export default function App() {
           <Route path="videos" element={<Videos />} />
           <Route path="contact" element={<Contact />} />
         </Route>
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/editor" element={<AdminProjectEditor />} />
-        <Route path="/admin/post-editor" element={<AdminPostEditor />} />
+        
+        <Route path="/login" element={<Login />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/editor" element={<AdminProjectEditor />} />
+          <Route path="/admin/post-editor" element={<AdminPostEditor />} />
+          <Route path="/admin/video-editor" element={<AdminVideoEditor />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

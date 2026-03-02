@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { LayoutDashboard, FolderKanban, MessageSquare, Plus, Edit, Trash2, Eye, MousePointerClick, FileText, CheckCircle, Clock, LayoutTemplate, X } from "lucide-react";
+import { LayoutDashboard, FolderKanban, MessageSquare, Plus, Edit, Trash2, Eye, MousePointerClick, FileText, CheckCircle, Clock, LayoutTemplate, X, PlayCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence } from "motion/react";
 
@@ -11,10 +11,15 @@ export default function Admin() {
   const [projects, setProjects] = useState([]);
   const [consultations, setConsultations] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [selectedConsultation, setSelectedConsultation] = useState<any>(null);
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [newProject, setNewProject] = useState({
     title: "", category: "Nhà phố", style: "", area: "", cost: "", description: "", thumbnail: "", video: ""
+  });
+
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean, type: 'project' | 'post' | 'video' | null, id: number | null }>({
+    isOpen: false, type: null, id: null
   });
 
   useEffect(() => {
@@ -26,6 +31,7 @@ export default function Admin() {
     fetch("/api/projects").then(res => res.json()).then(setProjects);
     fetch("/api/consultations").then(res => res.json()).then(setConsultations);
     fetch("/api/posts").then(res => res.json()).then(setPosts);
+    fetch("/api/videos").then(res => res.json()).then(setVideos);
   };
 
   const handleAddProject = async (e: React.FormEvent) => {
@@ -40,17 +46,28 @@ export default function Admin() {
     fetchData();
   };
 
-  const handleDeleteProject = async (id: number) => {
-    if (confirm("Bạn có chắc chắn muốn xóa dự án này?")) {
-      await fetch(`/api/projects/${id}`, { method: "DELETE" });
-      fetchData();
-    }
+  const openDeleteModal = (type: 'project' | 'post' | 'video', id: number) => {
+    setDeleteConfirmation({ isOpen: true, type, id });
   };
 
-  const handleDeletePost = async (id: number) => {
-    if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-      await fetch(`/api/posts/${id}`, { method: "DELETE" });
-      fetchData();
+  const confirmDelete = async () => {
+    if (!deleteConfirmation.id || !deleteConfirmation.type) return;
+
+    try {
+      const endpoint = deleteConfirmation.type === 'project' ? `/api/projects/${deleteConfirmation.id}` :
+                       deleteConfirmation.type === 'post' ? `/api/posts/${deleteConfirmation.id}` :
+                       `/api/videos/${deleteConfirmation.id}`;
+      
+      const res = await fetch(endpoint, { method: "DELETE" });
+      if (res.ok) {
+        fetchData();
+        setDeleteConfirmation({ isOpen: false, type: null, id: null });
+      } else {
+        alert("Có lỗi xảy ra khi xóa. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      alert("Có lỗi xảy ra khi xóa.");
     }
   };
 
@@ -75,6 +92,7 @@ export default function Admin() {
             { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
             { id: "projects", label: "Quản lý dự án", icon: FolderKanban },
             { id: "posts", label: "Đăng bài post", icon: FileText },
+            { id: "videos", label: "Quản lý Video", icon: PlayCircle },
             { id: "consultations", label: "Yêu cầu tư vấn", icon: MessageSquare },
           ].map((item) => (
             <button
@@ -177,7 +195,7 @@ export default function Admin() {
                       <td className="p-4 text-gray-600">{p.views}</td>
                       <td className="p-4 text-right space-x-2">
                         <button onClick={() => navigate('/admin/editor', { state: { project: p } })} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"><Edit size={18} /></button>
-                        <button onClick={() => handleDeleteProject(p.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"><Trash2 size={18} /></button>
+                        <button onClick={() => openDeleteModal('project', p.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"><Trash2 size={18} /></button>
                       </td>
                     </tr>
                   ))}
@@ -227,13 +245,69 @@ export default function Admin() {
                       <td className="p-4 text-gray-600">{new Date(p.created_at).toLocaleDateString('vi-VN')}</td>
                       <td className="p-4 text-right space-x-2">
                         <button onClick={() => navigate('/admin/post-editor', { state: { post: p } })} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"><Edit size={18} /></button>
-                        <button onClick={() => handleDeletePost(p.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"><Trash2 size={18} /></button>
+                        <button onClick={() => openDeleteModal('post', p.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"><Trash2 size={18} /></button>
                       </td>
                     </tr>
                   ))}
                   {posts.length === 0 && (
                     <tr>
                       <td colSpan={5} className="p-8 text-center text-gray-500">Chưa có bài viết nào. Hãy thêm bài viết đầu tiên!</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Videos Tab */}
+        {activeTab === "videos" && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-serif font-bold text-gray-800">Quản lý Video</h2>
+              <button 
+                onClick={() => navigate('/admin/video-editor')}
+                className="flex items-center px-6 py-3 bg-[var(--color-wood)] text-white font-medium rounded-xl hover:bg-[var(--color-gold)] transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+              >
+                <Plus size={20} className="mr-2" /> Thêm video mới
+              </button>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="p-4 font-semibold text-gray-600">Video</th>
+                    <th className="p-4 font-semibold text-gray-600">Danh mục</th>
+                    <th className="p-4 font-semibold text-gray-600">Thời lượng</th>
+                    <th className="p-4 font-semibold text-gray-600">Lượt xem</th>
+                    <th className="p-4 font-semibold text-gray-600 text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {videos.map((v: any) => (
+                    <tr key={v.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="p-4 flex items-center">
+                        <div className="relative w-16 h-10 rounded overflow-hidden mr-4 shrink-0">
+                          <img src={v.thumbnail || `https://img.youtube.com/vi/${v.youtube_id}/default.jpg`} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                            <PlayCircle size={16} className="text-white" />
+                          </div>
+                        </div>
+                        <span className="font-medium text-gray-800 line-clamp-1">{v.title}</span>
+                      </td>
+                      <td className="p-4 text-gray-600">{v.category}</td>
+                      <td className="p-4 text-gray-600">{v.duration}</td>
+                      <td className="p-4 text-gray-600">{v.views}</td>
+                      <td className="p-4 text-right space-x-2">
+                        <button onClick={() => navigate('/admin/video-editor', { state: { video: v } })} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"><Edit size={18} /></button>
+                        <button onClick={() => openDeleteModal('video', v.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"><Trash2 size={18} /></button>
+                      </td>
+                    </tr>
+                  ))}
+                  {videos.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-gray-500">Chưa có video nào. Hãy thêm video đầu tiên!</td>
                     </tr>
                   )}
                 </tbody>
@@ -309,6 +383,49 @@ export default function Admin() {
         )}
 
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirmation.isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={() => setDeleteConfirmation({ isOpen: false, type: null, id: null })}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden p-6 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Xác nhận xóa</h3>
+              <p className="text-gray-500 mb-6">
+                Bạn có chắc chắn muốn xóa {deleteConfirmation.type === 'project' ? 'dự án' : deleteConfirmation.type === 'post' ? 'bài viết' : 'video'} này không? Hành động này không thể hoàn tác.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button 
+                  onClick={() => setDeleteConfirmation({ isOpen: false, type: null, id: null })}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button 
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                >
+                  Xóa ngay
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Consultation Details Modal */}
       <AnimatePresence>

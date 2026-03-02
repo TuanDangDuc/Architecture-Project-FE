@@ -12,7 +12,19 @@ export default function AdminPostEditor() {
   const [editor, setEditor] = useState<any>(null);
   const [step, setStep] = useState<'info' | 'builder'>('info');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewContent, setPreviewContent] = useState({ html: '', css: '' });
   const navigate = useNavigate();
+
+  const handlePreview = () => {
+    if (editor) {
+      setPreviewContent({
+        html: editor.getHtml(),
+        css: editor.getCss()
+      });
+      setIsPreviewOpen(true);
+    }
+  };
   
   const [postInfo, setPostInfo] = useState({
     id: editPost?.id || null,
@@ -68,6 +80,34 @@ export default function AdminPostEditor() {
       height: '100%',
       width: 'auto',
       storageManager: false,
+      selectorManager: { componentFirst: true },
+      styleManager: {
+        appendTo: '#styles-container',
+        sectors: [
+          {
+            name: 'Typography',
+            open: true,
+            buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-decoration', 'font-style'],
+            properties: [
+              { name: 'Font', property: 'font-family' },
+              { name: 'Size', property: 'font-size' },
+              { name: 'Weight', property: 'font-weight' },
+              { name: 'Color', property: 'color', type: 'color' },
+              { name: 'Align', property: 'text-align' }
+            ],
+          },
+          {
+            name: 'Decorations',
+            open: false,
+            buildProps: ['background-color', 'border-radius', 'border', 'box-shadow', 'opacity'],
+          },
+          {
+            name: 'Dimension',
+            open: false,
+            buildProps: ['width', 'height', 'margin', 'padding'],
+          }
+        ],
+      },
       panels: { defaults: [] },
       blockManager: {
         appendTo: '#blocks',
@@ -96,7 +136,12 @@ export default function AdminPostEditor() {
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
               <b>Hình ảnh</b>
             `,
-            content: '<img class="article-image" src="https://loremflickr.com/800/500/architecture" alt="Image" />',
+            content: `
+              <figure class="image-figure">
+                <img class="article-image" src="https://loremflickr.com/800/500/architecture" alt="Image" />
+                <figcaption class="image-caption">Nhập chú thích hình ảnh tại đây</figcaption>
+              </figure>
+            `,
             category: 'Đa phương tiện',
           },
           {
@@ -135,8 +180,26 @@ export default function AdminPostEditor() {
     const defaultTemplate = `
       <h2 class="article-title">Tiêu đề bài viết</h2>
       <p class="article-text">Nhập nội dung bài viết của bạn tại đây...</p>
-      <img class="article-image" src="https://loremflickr.com/800/500/architecture?lock=1" alt="Hình ảnh minh họa" />
+      
+      <figure class="image-figure">
+        <img class="article-image" src="https://loremflickr.com/800/500/architecture?lock=1" alt="Hình ảnh minh họa" />
+        <figcaption class="image-caption">Chú thích hình ảnh minh họa</figcaption>
+      </figure>
+      
       <p class="article-text">Tiếp tục nội dung bài viết...</p>
+
+      <style>
+        .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
+        .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
+        .image-figure { margin: 2rem 0; width: 100%; }
+        .article-image { width: 100%; border-radius: 12px 12px 0 0; display: block; }
+        .image-caption { background-color: #f9f9f9; color: #555; padding: 12px; text-align: center; font-style: italic; font-size: 0.9rem; border-radius: 0 0 12px 12px; margin-top: 0; border: 1px solid #eee; border-top: none; }
+        .article-quote { background-color: #FDFBF7; border-left: 4px solid #9E2A25; padding: 2rem; margin: 2rem 0; border-radius: 0 12px 12px 0; position: relative; }
+        .quote-icon { font-size: 2rem; color: #9E2A25; line-height: 1; margin-bottom: 1rem; }
+        .quote-title { font-weight: bold; color: #7B1E1A; margin-bottom: 0.5rem; }
+        .quote-text { font-family: "Playfair Display", serif; font-size: 1.4rem; font-style: italic; color: #333; margin-bottom: 1rem; line-height: 1.6; }
+        .quote-author { font-weight: bold; color: #7B1E1A; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+      </style>
     `;
 
     const initialContent = postInfo.content || defaultTemplate;
@@ -222,12 +285,21 @@ export default function AdminPostEditor() {
         
         <div className="flex items-center gap-3">
           {step === 'builder' && (
-            <button 
-              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer ${isSettingsOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
-            >
-              <Settings size={18} /> Thông tin cơ bản
-            </button>
+            <>
+              <button 
+                onClick={handlePreview}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer text-gray-600 hover:bg-gray-100"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                Xem trước
+              </button>
+              <button 
+                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer ${isSettingsOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                <Settings size={18} /> Thông tin cơ bản
+              </button>
+            </>
           )}
           
           {step === 'info' ? (
@@ -412,12 +484,11 @@ export default function AdminPostEditor() {
         )}
 
         {/* Sidebar Blocks */}
-        <div className={`w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 z-10 shadow-sm transition-opacity duration-300 ${step === 'builder' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 z-10 shadow-sm transition-all duration-300 ${step === 'builder' ? 'translate-x-0' : '-translate-x-full absolute'}`}>
           <div className="p-4 border-b border-gray-200 bg-gray-50">
             <h2 className="font-bold text-sm uppercase tracking-wider text-gray-700">
-              Kéo thả các khối
+              Kéo thả
             </h2>
-            <p className="text-xs text-gray-500 mt-1">Kéo các khối dưới đây vào khung soạn thảo bên phải</p>
           </div>
           <div id="blocks" className="flex-1 overflow-y-auto p-4 custom-grapesjs-blocks"></div>
         </div>
@@ -426,76 +497,147 @@ export default function AdminPostEditor() {
         <div className={`flex-1 bg-gray-100 overflow-hidden relative transition-opacity duration-300 ${step === 'builder' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <div ref={editorRef} className="absolute inset-0"></div>
         </div>
+
+        {/* Right Sidebar - Style Manager */}
+        <div className={`w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 z-10 shadow-sm transition-all duration-300 ${step === 'builder' ? 'translate-x-0' : 'translate-x-full absolute right-0'}`}>
+          <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 className="font-bold text-sm uppercase tracking-wider text-gray-700">
+              Tùy chỉnh
+            </h2>
+          </div>
+          <div id="styles-container" className="flex-1 overflow-y-auto p-4 custom-grapesjs-styles">
+            <p className="text-xs text-gray-400 text-center mt-4">Chọn một phần tử để chỉnh sửa kiểu dáng</p>
+          </div>
+        </div>
       </div>
-      
-      {/* Custom CSS for GrapesJS Blocks Panel */}
+
+      {/* Preview Modal */}
+      {isPreviewOpen && (
+        <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+          <div className="max-w-5xl mx-auto px-4 py-12">
+            <div className="flex justify-between items-center mb-8 border-b pb-4">
+              <h2 className="text-2xl font-serif font-bold text-[var(--color-wood)]">Xem trước nội dung</h2>
+              <button 
+                onClick={() => setIsPreviewOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-gray-700 font-medium cursor-pointer"
+              >
+                <X size={20} /> Đóng xem trước
+              </button>
+            </div>
+            <div className="prose prose-lg max-w-none">
+              <style>{previewContent.css}</style>
+              <div dangerouslySetInnerHTML={{ __html: previewContent.html }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom CSS for GrapesJS */}
       <style>{`
-        .custom-grapesjs-blocks .gjs-block {
-          width: 100%;
-          min-height: 90px;
-          padding: 15px;
-          margin-bottom: 12px;
-          border-radius: 12px;
-          border: 1px solid #e5e7eb;
-          background: white;
-          color: #374151;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-          cursor: grab;
-          position: relative;
-          overflow: hidden;
-        }
-        .custom-grapesjs-blocks .gjs-block:hover {
-          border-color: var(--color-gold);
-          color: var(--color-wood);
-          box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
-          transform: translateY(-4px);
-        }
-        .custom-grapesjs-blocks .gjs-block:active {
-          cursor: grabbing;
-          transform: translateY(0);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .custom-grapesjs-blocks .gjs-block-label {
-          margin-top: 8px;
-          font-size: 14px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .custom-grapesjs-blocks .gjs-block-category {
-          font-weight: bold;
-          font-size: 12px;
-          text-transform: uppercase;
-          color: #9ca3af;
-          margin-bottom: 12px;
-          padding-bottom: 6px;
-          border-bottom: 1px solid #f3f4f6;
-          width: 100%;
-        }
-        
-        /* Tùy chỉnh khung canvas của GrapesJS để full màn hình */
+        /* ... existing styles ... */
         .gjs-cv-canvas {
-          background-color: #f3f4f6;
           width: 100% !important;
           height: 100% !important;
           top: 0 !important;
           left: 0 !important;
         }
-        .gjs-frame {
-          background-color: white;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-          width: 100% !important;
-          height: 100% !important;
+
+        /* Sidebar Styling */
+        .custom-grapesjs-blocks, .custom-grapesjs-styles {
+          background-color: #ffffff;
         }
-        .gjs-frame-wrapper {
-          padding: 0 !important;
-          width: 100% !important;
-          height: 100% !important;
+
+        /* Block Styling */
+        .custom-grapesjs-blocks .gjs-block {
+          background: #fff;
+          border: 1px solid #e5e7eb;
+          color: #4b5563;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+          transition: all 0.2s ease;
+        }
+        .custom-grapesjs-blocks .gjs-block:hover {
+          border-color: var(--color-gold);
+          color: var(--color-wood);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .custom-grapesjs-blocks .gjs-block-category {
+          background: #f9fafb;
+          color: var(--color-wood);
+          border-bottom: 1px solid #e5e7eb;
+          padding: 8px 12px;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+        }
+
+        /* Style Manager Styling */
+        .gjs-sm-sector {
+          border-bottom: 1px solid #f3f4f6;
+          padding: 12px 0;
+        }
+        .gjs-sm-title {
+          background: #f9fafb;
+          padding: 8px 12px;
+          border-radius: 6px;
+          color: var(--color-wood);
+          font-weight: 600;
+          margin-bottom: 8px;
+          border: 1px solid #f3f4f6;
+        }
+        .gjs-sm-properties {
+          padding: 0 4px;
+        }
+        .gjs-field {
+          background: #fff;
+          border: 1px solid #d1d5db;
+          border-radius: 6px;
+          padding: 6px;
+          transition: border-color 0.2s;
+        }
+        .gjs-field:focus-within {
+          border-color: var(--color-gold);
+          ring: 2px solid var(--color-gold);
+        }
+        .gjs-field input, .gjs-field select {
+          color: #374151;
+          font-size: 13px;
+        }
+        .gjs-sm-label {
+          color: #6b7280;
+          font-size: 12px;
+          font-weight: 500;
+          margin-bottom: 4px;
+        }
+        
+        /* Radio Buttons */
+        .gjs-radio-items {
+          background: #f3f4f6;
+          padding: 3px;
+          border-radius: 6px;
+        }
+        .gjs-radio-item {
+          border-radius: 4px;
+          color: #6b7280;
+        }
+        .gjs-radio-item.gjs-sm-active {
+          background: white;
+          color: var(--color-wood);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #d1d5db;
+          border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #9ca3af;
         }
       `}</style>
     </div>

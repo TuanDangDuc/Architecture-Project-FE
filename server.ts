@@ -54,6 +54,18 @@ db.exec(`
     views INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS videos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    thumbnail TEXT,
+    duration TEXT,
+    views INTEGER DEFAULT 0,
+    category TEXT,
+    youtube_id TEXT,
+    project_id INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Insert sample data if empty
@@ -61,6 +73,55 @@ try {
   db.exec("ALTER TABLE projects ADD COLUMN content TEXT");
 } catch (e) {
   // Column already exists
+}
+
+const videoCount = db.prepare("SELECT COUNT(*) as count FROM videos").get() as { count: number };
+if (videoCount.count === 0) {
+  const insertVideo = db.prepare(`
+    INSERT INTO videos (title, thumbnail, duration, views, category, youtube_id, project_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  insertVideo.run(
+    "Review Biệt thự Thảo Điền - Không gian sống đẳng cấp ven sông",
+    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "15:20",
+    12000,
+    "Biệt thự",
+    "dQw4w9WgXcQ",
+    1
+  );
+  insertVideo.run(
+    "Khám phá Penthouse Landmark 81 với thiết kế nội thất siêu sang",
+    "https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "12:45",
+    8500,
+    "Nội thất",
+    "dQw4w9WgXcQ",
+    3
+  );
+  insertVideo.run(
+    "Nhà phố Minimalist 4 tầng tại Quận 7 - Tối ưu ánh sáng tự nhiên",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "10:30",
+    5200,
+    "Nhà phố",
+    "dQw4w9WgXcQ",
+    2
+  );
+}
+
+const consultationCount = db.prepare("SELECT COUNT(*) as count FROM consultations").get() as { count: number };
+if (consultationCount.count === 0) {
+  const insertConsultation = db.prepare(`
+    INSERT INTO consultations (name, phone, email, area, budget, type, time, description, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  
+  insertConsultation.run("Nguyễn Văn An", "0909123456", "nguyenvanan@gmail.com", 100, "1 - 2 tỷ", "Thiết kế nhà phố", "Buổi sáng (8h-12h)", "Tôi có mảnh đất 5x20m, muốn xây nhà phố 3 tầng phong cách hiện đại, có gara ô tô.", "Mới");
+  insertConsultation.run("Trần Thị Bích", "0912345678", "tranthibich@gmail.com", 250, "Trên 5 tỷ", "Thiết kế biệt thự", "Buổi chiều (13h-17h)", "Tư vấn thiết kế biệt thự vườn nghỉ dưỡng tại Bảo Lộc, ưu tiên không gian mở và vật liệu tự nhiên.", "Đang xử lý");
+  insertConsultation.run("Lê Hoàng Nam", "0987654321", "lehoangnam@outlook.com", 75, "500tr - 1 tỷ", "Thiết kế nội thất", "Buổi tối (18h-21h)", "Cần thiết kế và thi công nội thất căn hộ chung cư 2 phòng ngủ, phong cách tối giản (Minimalism).", "Đã liên hệ");
+  insertConsultation.run("Phạm Minh Tuấn", "0933445566", "tuanpham@company.com", 150, "2 - 5 tỷ", "Thi công trọn gói", "Buổi sáng (8h-12h)", "Xây dựng nhà phố kết hợp văn phòng kinh doanh, mặt tiền 6m.", "Mới");
 }
 
 const projectCount = db.prepare("SELECT COUNT(*) as count FROM projects").get() as { count: number };
@@ -79,7 +140,58 @@ if (projectCount.count === 0) {
     "Thiết kế biệt thự phố với không gian mở, hồ bơi vô cực và sân vườn trên mái.", 
     "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
     "[]",
-    "<p>Chi tiết dự án biệt thự phố hiện đại tại Quận 7...</p>"
+    <style>
+      .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
+      .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
+      .article-image { width: 100%; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+      .article-quote { background-color: #FDFBF7; border-left: 4px solid #9E2A25; padding: 2rem; margin: 2rem 0; border-radius: 0 12px 12px 0; position: relative; }
+      .quote-icon { font-size: 2rem; color: #9E2A25; line-height: 1; margin-bottom: 1rem; }
+      .quote-text { font-family: "Playfair Display", serif; font-size: 1.4rem; font-style: italic; color: #333; margin-bottom: 1rem; line-height: 1.6; }
+      .quote-author { font-weight: bold; color: #7B1E1A; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+      .project-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+      .feature-item { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee; }
+      .feature-title { font-weight: bold; color: #7B1E1A; margin-bottom: 0.5rem; }
+      .image-figure { margin: 2rem 0; text-align: center; }
+      .image-caption { font-style: italic; color: #666; font-size: 0.9rem; margin-top: 0.5rem; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; border: 1px solid #eee; }
+    </style>
+
+    <h2 class="article-title">Ý tưởng thiết kế</h2>
+    <p class="article-text">Lấy cảm hứng từ vẻ đẹp vượt thời gian của kiến trúc đương đại, dự án Biệt thự Phố Q.7 được thiết kế với tiêu chí tối ưu hóa không gian và kết nối con người với thiên nhiên. Từng đường nét kiến trúc đều được tính toán kỹ lưỡng để đón trọn ánh sáng tự nhiên và gió trời, tạo nên một không gian sống đẳng cấp giữa lòng đô thị.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Phối cảnh dự án" />
+      <figcaption class="image-caption">Phối cảnh tổng thể biệt thự nhìn từ trên cao</figcaption>
+    </figure>
+
+    <h2 class="article-title">Giải pháp không gian</h2>
+    <p class="article-text">Mặt bằng công năng được bố trí khoa học, phân khu rõ ràng nhưng vẫn đảm bảo sự kết nối xuyên suốt. Phòng khách và bếp được thiết kế liên thông tạo cảm giác rộng rãi, thoáng đãng. Điểm nhấn đặc biệt là hồ bơi vô cực trên tầng thượng, mang lại trải nghiệm nghỉ dưỡng ngay tại nhà.</p>
+
+    <div class="project-features">
+      <div class="feature-item">
+        <div class="feature-title">Thông gió tự nhiên</div>
+        <p>Hệ thống giếng trời và cửa sổ đối lưu giúp không khí luôn tươi mới, giảm thiểu sự phụ thuộc vào điều hòa.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-title">Ánh sáng tối ưu</div>
+        <p>Tận dụng tối đa ánh sáng mặt trời qua hệ vách kính lớn, giúp tiết kiệm năng lượng và tốt cho sức khỏe.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-title">Vật liệu cao cấp</div>
+        <p>Sử dụng đá Marble tự nhiên, gỗ Óc chó nhập khẩu và thiết bị vệ sinh Duravit sang trọng.</p>
+      </div>
+    </div>
+
+    <h2 class="article-title">Vật liệu & Thi công</h2>
+    <p class="article-text">Chúng tôi ưu tiên sử dụng các vật liệu tự nhiên như gỗ, đá, kết hợp với bê tông trần và kính cường lực. Sự tương phản giữa các bề mặt vật liệu tạo nên nét độc đáo và cá tính cho công trình. Quy trình thi công được giám sát nghiêm ngặt đảm bảo độ sắc nét trong từng chi tiết.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Chi tiết nội thất" />
+      <figcaption class="image-caption">Chi tiết nội thất phòng khách với vật liệu gỗ óc chó</figcaption>
+    </figure>
+
+    <div class="article-quote">
+      <div class="quote-icon">✦</div>
+      <p class="quote-text">"Tôi thực sự ấn tượng với sự chuyên nghiệp và tận tâm của đội ngũ Mai Hương Architects. Ngôi nhà không chỉ đẹp mà còn rất tiện nghi, đúng như những gì tôi hằng mơ ước về một tổ ấm bình yên."</p>
+      <p class="quote-author">- Anh Tuấn, Chủ đầu tư</p>
+    </div>`
   );
   insertProject.run(
     "Nhà Phố Tân Cổ Điển - Gò Vấp", 
@@ -90,7 +202,37 @@ if (projectCount.count === 0) {
     "Sự kết hợp tinh tế giữa nét đẹp cổ điển sang trọng và tiện nghi hiện đại.", 
     "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
     "[]",
-    "<p>Chi tiết dự án nhà phố tân cổ điển...</p>"
+    `<style>
+      .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
+      .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
+      .article-image { width: 100%; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+      .article-quote { background-color: #FDFBF7; border-left: 4px solid #9E2A25; padding: 2rem; margin: 2rem 0; border-radius: 0 12px 12px 0; position: relative; }
+      .quote-icon { font-size: 2rem; color: #9E2A25; line-height: 1; margin-bottom: 1rem; }
+      .quote-text { font-family: "Playfair Display", serif; font-size: 1.4rem; font-style: italic; color: #333; margin-bottom: 1rem; line-height: 1.6; }
+      .quote-author { font-weight: bold; color: #7B1E1A; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+      .image-figure { margin: 2rem 0; text-align: center; }
+      .image-caption { font-style: italic; color: #666; font-size: 0.9rem; margin-top: 0.5rem; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; border: 1px solid #eee; }
+    </style>
+
+    <h2 class="article-title">Vẻ đẹp vượt thời gian</h2>
+    <p class="article-text">Dự án Nhà phố Tân cổ điển tại Gò Vấp là minh chứng cho sự kết hợp hoàn hảo giữa vẻ đẹp kiêu sa của kiến trúc cổ điển và sự tiện nghi của cuộc sống hiện đại. Những đường phào chỉ tinh tế, hệ cột trụ vững chãi cùng gam màu trắng kem chủ đạo tạo nên một diện mạo sang trọng, thanh lịch.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Mặt tiền nhà phố tân cổ điển" />
+      <figcaption class="image-caption">Mặt tiền nhà phố với kiến trúc Tân cổ điển sang trọng</figcaption>
+    </figure>
+
+    <h2 class="article-title">Nội thất sang trọng</h2>
+    <p class="article-text">Không gian nội thất được chăm chút tỉ mỉ với các chất liệu cao cấp như gỗ tự nhiên, da thật và đá hoa cương. Phòng khách nổi bật với bộ sofa cổ điển, đèn chùm pha lê lộng lẫy, tạo nên không gian tiếp khách đẳng cấp.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Nội thất phòng khách" />
+      <figcaption class="image-caption">Không gian phòng khách với nội thất cao cấp</figcaption>
+    </figure>
+
+    <div class="article-quote">
+      <div class="quote-icon">✦</div>
+      <p class="quote-text">"Ngôi nhà mang lại cảm giác ấm cúng và sang trọng mỗi khi bước về. Cảm ơn đội ngũ KTS đã hiện thực hóa ý tưởng của gia đình tôi một cách xuất sắc."</p>
+      <p class="quote-author">- Chị Lan, Chủ đầu tư</p>
+    </div>`
   );
   insertProject.run(
     "Biệt thự Vườn Nghỉ Dưỡng - Đà Lạt", 
@@ -101,7 +243,31 @@ if (projectCount.count === 0) {
     "Không gian nghỉ dưỡng tuyệt vời giữa lòng thành phố ngàn hoa.", 
     "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
     "[]",
-    "<p>Chi tiết dự án biệt thự vườn Đà Lạt...</p>"
+    `<style>
+      .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
+      .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
+      .article-image { width: 100%; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+      .highlight-box { background-color: #eef2f5; border-left: 4px solid #2c3e50; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; font-style: italic; color: #555; }
+      .image-figure { margin: 2rem 0; text-align: center; }
+      .image-caption { font-style: italic; color: #666; font-size: 0.9rem; margin-top: 0.5rem; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; border: 1px solid #eee; }
+    </style>
+
+    <h2 class="article-title">Hơi thở Địa Trung Hải giữa lòng Đà Lạt</h2>
+    <p class="article-text">Nằm giữa đồi thông thơ mộng, biệt thự vườn mang phong cách Địa Trung Hải hiện lên như một bức tranh đầy màu sắc. Mái ngói đỏ nung, tường trắng và những vòm cửa cong mềm mại tạo nên nét quyến rũ khó cưỡng.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Biệt thự vườn Đà Lạt" />
+      <figcaption class="image-caption">Toàn cảnh biệt thự giữa đồi thông Đà Lạt</figcaption>
+    </figure>
+
+    <h2 class="article-title">Sân vườn và Cảnh quan</h2>
+    <p class="article-text">Khu vườn rộng lớn được thiết kế với nhiều loài hoa đặc trưng của Đà Lạt như Cẩm Tú Cầu, Lavender... Lối đi lát đá tự nhiên uốn lượn dẫn lối vào từng góc nhỏ bình yên, nơi gia chủ có thể thưởng trà và ngắm nhìn thung lũng.</p>
+    
+    <div class="highlight-box">
+      "Một không gian sống chậm, nơi con người hòa mình vào thiên nhiên và tận hưởng những khoảnh khắc an yên."
+    </div>
+
+    <h2 class="article-title">Nội thất Rustic mộc mạc</h2>
+    <p class="article-text">Nội thất bên trong sử dụng chủ yếu là gỗ thông, vải thô và gốm sứ, mang lại cảm giác ấm áp, gần gũi. Lò sưởi được bố trí tại trung tâm phòng khách, là nơi cả gia đình quây quần trong những đêm Đà Lạt se lạnh.</p>`
   );
   insertProject.run(
     "Nhà Ống Lệch Tầng - Bình Thạnh", 
@@ -112,7 +278,20 @@ if (projectCount.count === 0) {
     "Giải pháp tối ưu không gian và ánh sáng cho nhà phố diện tích nhỏ.", 
     "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
     "[]",
-    "<p>Chi tiết dự án nhà ống lệch tầng...</p>"
+    `<style>
+      .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
+      .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
+      .article-image { width: 100%; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+      .image-figure { margin: 2rem 0; text-align: center; }
+      .image-caption { font-style: italic; color: #666; font-size: 0.9rem; margin-top: 0.5rem; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; border: 1px solid #eee; }
+    </style>
+    <h2 class="article-title">Giải pháp cho nhà phố diện tích nhỏ</h2>
+    <p class="article-text">Với diện tích đất hạn chế, giải pháp lệch tầng được áp dụng để tạo sự thông thoáng và kết nối các không gian. Cầu thang được bố trí gọn gàng, kết hợp với giếng trời giúp ánh sáng len lỏi vào từng tầng.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Nhà ống lệch tầng" />
+      <figcaption class="image-caption">Mặt cắt phối cảnh nhà ống lệch tầng</figcaption>
+    </figure>
+    <p class="article-text">Phong cách Minimalism (Tối giản) được lựa chọn để tối ưu hóa không gian sử dụng. Màu trắng chủ đạo kết hợp với nội thất gỗ sáng màu tạo cảm giác rộng rãi hơn so với diện tích thực.</p>`
   );
   insertProject.run(
     "Biệt thự Mái Thái - Đồng Nai", 
@@ -123,7 +302,20 @@ if (projectCount.count === 0) {
     "Kiến trúc mái Thái truyền thống kết hợp công năng hiện đại, phù hợp khí hậu nhiệt đới.", 
     "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
     "[]",
-    "<p>Chi tiết dự án biệt thự mái Thái...</p>"
+    `<style>
+      .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
+      .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
+      .article-image { width: 100%; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+      .image-figure { margin: 2rem 0; text-align: center; }
+      .image-caption { font-style: italic; color: #666; font-size: 0.9rem; margin-top: 0.5rem; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; border: 1px solid #eee; }
+    </style>
+    <h2 class="article-title">Kiến trúc truyền thống và hiện đại</h2>
+    <p class="article-text">Biệt thự mái Thái luôn là lựa chọn hàng đầu của nhiều gia đình Việt nhờ vẻ đẹp thanh thoát và khả năng chống nóng, chống thấm tốt. Tại dự án này, chúng tôi đã cách tân hệ mái để phù hợp hơn với thẩm mỹ đương đại.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Biệt thự mái Thái" />
+      <figcaption class="image-caption">Biệt thự mái Thái với sân vườn rộng rãi</figcaption>
+    </figure>
+    <p class="article-text">Không gian sân vườn rộng rãi bao quanh ngôi nhà, tạo nên một hệ sinh thái xanh mát. Hồ cá Koi và chòi nghỉ là điểm nhấn thư giãn cho cả gia đình vào dịp cuối tuần.</p>`
   );
   insertProject.run(
     "Nội thất Căn hộ Duplex - Q.2", 
@@ -134,7 +326,20 @@ if (projectCount.count === 0) {
     "Thiết kế nội thất sang trọng, đẳng cấp với vật liệu cao cấp nhập khẩu.", 
     "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
     "[]",
-    "<p>Chi tiết dự án nội thất Duplex...</p>"
+    `<style>
+      .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
+      .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
+      .article-image { width: 100%; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+      .image-figure { margin: 2rem 0; text-align: center; }
+      .image-caption { font-style: italic; color: #666; font-size: 0.9rem; margin-top: 0.5rem; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; border: 1px solid #eee; }
+    </style>
+    <h2 class="article-title">Đẳng cấp sống thượng lưu</h2>
+    <p class="article-text">Căn hộ Duplex tại Quận 2 được thiết kế theo phong cách Luxury, đề cao sự sang trọng và tinh tế. Phòng khách thông tầng với vách kính Panorama mở ra tầm nhìn tuyệt đẹp về trung tâm thành phố.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Nội thất Duplex" />
+      <figcaption class="image-caption">Phòng khách thông tầng với view Panorama</figcaption>
+    </figure>
+    <p class="article-text">Vật liệu kim loại mạ vàng PVD, đá Marble và da bò Ý được phối hợp hài hòa, tạo nên những điểm nhấn đắt giá cho không gian sống.</p>`
   );
 }
 
@@ -154,17 +359,20 @@ if (postCount.count === 0) {
       .article-heading { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
       .article-subheading { font-family: "Playfair Display", serif; font-size: 1.4rem; font-weight: 600; color: #333; margin-top: 2rem; margin-bottom: 0.8rem; }
       .article-image { width: 100%; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-      .article-caption { text-align: center; font-style: italic; font-size: 0.9rem; color: #666; margin-top: -1.5rem; margin-bottom: 2rem; }
       .article-list { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; }
       .article-list li { margin-bottom: 0.5rem; line-height: 1.6; }
       .highlight-box { background-color: #FDFBF7; border-left: 4px solid #9E2A25; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; }
+      .image-figure { margin: 2rem 0; text-align: center; }
+      .image-caption { font-style: italic; color: #666; font-size: 0.9rem; margin-top: 0.5rem; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; border: 1px solid #eee; }
     </style>
     <p class="article-text">Năm 2024 đánh dấu sự lên ngôi của phong cách thiết kế bền vững và sự quay trở lại của những giá trị truyền thống được làm mới. Không gian sống không chỉ đơn thuần là nơi trú ngụ, mà còn là nơi chữa lành, kết nối con người với thiên nhiên và với chính bản thân mình.</p>
     
     <h2 class="article-heading">1. Không gian xanh đa tầng</h2>
     <p class="article-text">Xu hướng "mang thiên nhiên vào nhà" không còn mới, nhưng trong năm 2024, nó được nâng lên một tầm cao mới với khái niệm "không gian xanh đa tầng". Không chỉ là một vài chậu cây ở ban công, kiến trúc sư đang tích hợp mảng xanh vào mọi ngóc ngách: từ giếng trời, sân trong (courtyard) cho đến những khu vườn trên mái.</p>
-    <img class="article-image" src="https://images.unsplash.com/photo-1592595896551-12b371d546d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Không gian xanh trong nhà phố" />
-    <p class="article-caption">Giếng trời kết hợp cây xanh tạo nên lá phổi tự nhiên cho ngôi nhà.</p>
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1592595896551-12b371d546d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Không gian xanh trong nhà phố" />
+      <figcaption class="image-caption">Giếng trời kết hợp cây xanh tạo nên lá phổi tự nhiên cho ngôi nhà.</figcaption>
+    </figure>
 
     <h2 class="article-heading">2. Vật liệu bền vững và thô mộc</h2>
     <p class="article-text">Sự lên ngôi của Wabi Sabi và Japandi đã mở đường cho các vật liệu thô mộc như bê tông trần, gạch nung, gỗ tự nhiên và đá ong. Vẻ đẹp không hoàn hảo của bề mặt vật liệu mang lại cảm giác gần gũi, ấm áp và có chiều sâu thời gian.</p>
@@ -232,6 +440,8 @@ if (postCount.count === 0) {
       .article-heading { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
       .article-image { width: 100%; border-radius: 0; margin: 2rem 0; }
       .quote-box { font-family: "Playfair Display", serif; font-size: 1.5rem; font-style: italic; text-align: center; color: #7B1E1A; margin: 3rem 0; padding: 0 2rem; }
+      .image-figure { margin: 2rem 0; text-align: center; }
+      .image-caption { font-style: italic; color: #666; font-size: 0.9rem; margin-top: 0.5rem; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 2rem; display: inline-block; border: 1px solid #eee; }
     </style>
     <p class="article-text">Phong cách Indochine (Đông Dương) là sự giao thoa bản sắc giữa nền văn hóa Á Đông lâu đời và nét lãng mạn, hiện đại của kiến trúc Pháp. Trải qua bao thăng trầm lịch sử, Indochine vẫn giữ nguyên sức hút mãnh liệt, trở thành biểu tượng của sự sang trọng, tinh tế và hoài niệm.</p>
     
@@ -240,7 +450,10 @@ if (postCount.count === 0) {
     <h2 class="article-heading">Đặc trưng của phong cách Indochine</h2>
     <p class="article-text">Không gian Indochine thường sử dụng các gam màu nhiệt đới ấm nóng như vàng nhạt, vàng kem, trắng... kết hợp với màu sắc của vật liệu tự nhiên như gỗ, tre, mây, gạch bông. Điểm nhấn thường là những họa tiết kỷ hà, hoa lá cách điệu hay tĩnh vật mang đậm bản sắc văn hóa Việt Nam.</p>
     
-    <img class="article-image" src="https://images.unsplash.com/photo-1551516594-56cb78394645?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Nội thất phong cách Indochine" />
+    <figure class="image-figure">
+      <img class="article-image" src="https://images.unsplash.com/photo-1551516594-56cb78394645?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Nội thất phong cách Indochine" />
+      <figcaption class="image-caption">Không gian nội thất Indochine với gạch bông và gỗ tự nhiên</figcaption>
+    </figure>
 
     <h2 class="article-heading">Vật liệu truyền thống</h2>
     <p class="article-text">Gỗ tự nhiên, tre, mây, gạch bông (gạch cement) là những vật liệu không thể thiếu. Chúng không chỉ bền bỉ với khí hậu nhiệt đới mà còn mang lại cảm giác gần gũi, thân thuộc.</p>
@@ -393,6 +606,44 @@ async function startServer() {
 
   app.delete("/api/posts/:id", (req, res) => {
     const stmt = db.prepare("DELETE FROM posts WHERE id = ?");
+    stmt.run(req.params.id);
+    res.json({ success: true });
+  });
+
+  // --- Videos API ---
+  app.get("/api/videos", (req, res) => {
+    const videos = db.prepare("SELECT * FROM videos ORDER BY created_at DESC").all();
+    res.json(videos);
+  });
+
+  app.get("/api/videos/:id", (req, res) => {
+    const video = db.prepare("SELECT * FROM videos WHERE id = ?").get(req.params.id);
+    if (video) res.json(video);
+    else res.status(404).json({ error: "Not found" });
+  });
+
+  app.post("/api/videos", (req, res) => {
+    const { title, thumbnail, duration, category, youtube_id, project_id } = req.body;
+    const stmt = db.prepare(`
+      INSERT INTO videos (title, thumbnail, duration, category, youtube_id, project_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+    const info = stmt.run(title, thumbnail, duration, category, youtube_id, project_id);
+    res.json({ id: info.lastInsertRowid });
+  });
+
+  app.put("/api/videos/:id", (req, res) => {
+    const { title, thumbnail, duration, category, youtube_id, project_id } = req.body;
+    const stmt = db.prepare(`
+      UPDATE videos SET title = ?, thumbnail = ?, duration = ?, category = ?, youtube_id = ?, project_id = ?
+      WHERE id = ?
+    `);
+    stmt.run(title, thumbnail, duration, category, youtube_id, project_id, req.params.id);
+    res.json({ success: true });
+  });
+
+  app.delete("/api/videos/:id", (req, res) => {
+    const stmt = db.prepare("DELETE FROM videos WHERE id = ?");
     stmt.run(req.params.id);
     res.json({ success: true });
   });

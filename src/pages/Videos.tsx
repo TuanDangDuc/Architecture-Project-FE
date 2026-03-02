@@ -5,74 +5,39 @@ import { PlayCircle, Eye, Calendar, X, ArrowRight } from "lucide-react";
 
 export default function Videos() {
   const [activeVideo, setActiveVideo] = useState<any>(null);
-  const [videos, setVideos] = useState([
-    {
-      id: 1,
-      title: "Review Biệt thự Thảo Điền - Không gian sống đẳng cấp ven sông",
-      thumbnail: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "15:20",
-      views: "12K",
-      date: "20/10/2023",
-      category: "Biệt thự",
-      youtubeId: "dQw4w9WgXcQ", // Placeholder YouTube ID
-      projectId: 1
-    },
-    {
-      id: 2,
-      title: "Khám phá Penthouse Landmark 81 với thiết kế nội thất siêu sang",
-      thumbnail: "https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "12:45",
-      views: "8.5K",
-      date: "15/10/2023",
-      category: "Nội thất",
-      youtubeId: "dQw4w9WgXcQ",
-      projectId: 3
-    },
-    {
-      id: 3,
-      title: "Nhà phố Minimalist 4 tầng tại Quận 7 - Tối ưu ánh sáng tự nhiên",
-      thumbnail: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "10:30",
-      views: "5.2K",
-      date: "05/10/2023",
-      category: "Nhà phố",
-      youtubeId: "dQw4w9WgXcQ",
-      projectId: 2
-    },
-    {
-      id: 4,
-      title: "Cải tạo căn hộ chung cư cũ thành không gian sống hiện đại",
-      thumbnail: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "18:15",
-      views: "15K",
-      date: "28/09/2023",
-      category: "Cải tạo",
-      youtubeId: "dQw4w9WgXcQ",
-      projectId: 6
-    },
-    {
-      id: 5,
-      title: "Villa Đà Lạt phong cách Indochine - Nơi giao thoa kiến trúc",
-      thumbnail: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "22:00",
-      views: "20K",
-      date: "12/09/2023",
-      category: "Nhà vườn",
-      youtubeId: "dQw4w9WgXcQ",
-      projectId: 4
-    },
-    {
-      id: 6,
-      title: "Kinh nghiệm thi công nội thất gỗ óc chó cao cấp",
-      thumbnail: "https://images.unsplash.com/photo-1600585154526-990dced4ea0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      duration: "08:50",
-      views: "3.1K",
-      date: "01/09/2023",
-      category: "Kinh nghiệm",
-      youtubeId: "dQw4w9WgXcQ",
-      projectId: 5
+  const [videos, setVideos] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/videos')
+      .then(res => res.json())
+      .then(data => {
+        // Format data to match UI requirements
+        const formattedVideos = data.map((video: any) => ({
+          ...video,
+          id: video.id,
+          title: video.title,
+          thumbnail: video.thumbnail || `https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`,
+          duration: video.duration,
+          views: formatViews(video.views),
+          date: new Date(video.created_at).toLocaleDateString('vi-VN'),
+          category: video.category,
+          youtubeId: video.youtube_id,
+          projectId: video.project_id
+        }));
+        setVideos(formattedVideos);
+      })
+      .catch(err => console.error("Error fetching videos:", err));
+  }, []);
+
+  const formatViews = (num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
     }
-  ]);
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  };
 
   // Prevent scrolling when modal is open
   useEffect(() => {

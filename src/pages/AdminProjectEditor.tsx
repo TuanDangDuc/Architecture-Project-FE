@@ -12,7 +12,19 @@ export default function AdminProjectEditor() {
   const [editor, setEditor] = useState<any>(null);
   const [step, setStep] = useState<'info' | 'builder'>('info');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewContent, setPreviewContent] = useState({ html: '', css: '' });
   const navigate = useNavigate();
+
+  const handlePreview = () => {
+    if (editor) {
+      setPreviewContent({
+        html: editor.getHtml(),
+        css: editor.getCss()
+      });
+      setIsPreviewOpen(true);
+    }
+  };
   
   const [projectInfo, setProjectInfo] = useState({
     id: editProject?.id || null,
@@ -22,12 +34,14 @@ export default function AdminProjectEditor() {
     area: editProject?.area || "", 
     cost: editProject?.cost || "", 
     thumbnail: editProject?.thumbnail || "",
+    gallery: editProject?.gallery || [],
     description: editProject?.description || "",
     content: editProject?.content || "",
     video: editProject?.video || ""
   });
   
   const [isDragging, setIsDragging] = useState(false);
+  const [newGalleryUrl, setNewGalleryUrl] = useState("");
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -63,6 +77,48 @@ export default function AdminProjectEditor() {
     }
   };
 
+  const handleGalleryFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files);
+      const newImages: string[] = [];
+      
+      let processedCount = 0;
+      files.forEach((file: File) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (reader.result) {
+            newImages.push(reader.result as string);
+          }
+          processedCount++;
+          if (processedCount === files.length) {
+            setProjectInfo(prev => ({
+              ...prev,
+              gallery: [...(prev.gallery || []), ...newImages]
+            }));
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const addGalleryUrl = () => {
+    if (newGalleryUrl.trim()) {
+      setProjectInfo(prev => ({
+        ...prev,
+        gallery: [...(prev.gallery || []), newGalleryUrl.trim()]
+      }));
+      setNewGalleryUrl("");
+    }
+  };
+
+  const removeGalleryImage = (index: number) => {
+    setProjectInfo(prev => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index)
+    }));
+  };
+
   useEffect(() => {
     if (step !== 'builder' || !editorRef.current) return;
 
@@ -70,8 +126,36 @@ export default function AdminProjectEditor() {
       container: editorRef.current,
       height: '100%',
       width: 'auto',
-      storageManager: false, // Tắt lưu tự động, sẽ xử lý thủ công khi bấm Lưu
-      panels: { defaults: [] }, // Tắt các panel mặc định để tự build UI đơn giản
+      storageManager: false,
+      selectorManager: { componentFirst: true },
+      styleManager: {
+        appendTo: '#styles-container',
+        sectors: [
+          {
+            name: 'Typography',
+            open: true,
+            buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-decoration', 'font-style'],
+            properties: [
+              { name: 'Font', property: 'font-family' },
+              { name: 'Size', property: 'font-size' },
+              { name: 'Weight', property: 'font-weight' },
+              { name: 'Color', property: 'color', type: 'color' },
+              { name: 'Align', property: 'text-align' }
+            ],
+          },
+          {
+            name: 'Decorations',
+            open: false,
+            buildProps: ['background-color', 'border-radius', 'border', 'box-shadow', 'opacity'],
+          },
+          {
+            name: 'Dimension',
+            open: false,
+            buildProps: ['width', 'height', 'margin', 'padding'],
+          }
+        ],
+      },
+      panels: { defaults: [] },
       blockManager: {
         appendTo: '#blocks',
         blocks: [
@@ -99,7 +183,12 @@ export default function AdminProjectEditor() {
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
               <b>Hình ảnh</b>
             `,
-            content: '<img class="article-image" src="https://loremflickr.com/800/500/architecture" alt="Image" />',
+            content: `
+              <figure class="image-figure">
+                <img class="article-image" src="https://loremflickr.com/800/500/architecture" alt="Image" />
+                <figcaption class="image-caption">Nhập chú thích hình ảnh tại đây</figcaption>
+              </figure>
+            `,
             category: 'Đa phương tiện',
           },
           {
@@ -138,7 +227,11 @@ export default function AdminProjectEditor() {
     const defaultTemplate = `
       <h2 class="article-title">Ý tưởng thiết kế</h2>
       <p class="article-text">Nhập mô tả ý tưởng thiết kế của bạn tại đây. Lấy cảm hứng từ phong cách hiện đại, đội ngũ kiến trúc sư đã khéo léo sử dụng các vật liệu tự nhiên...</p>
-      <img class="article-image" src="https://loremflickr.com/800/500/architecture?lock=1" alt="Ý tưởng thiết kế" />
+      
+      <figure class="image-figure">
+        <img class="article-image" src="https://loremflickr.com/800/500/architecture?lock=1" alt="Ý tưởng thiết kế" />
+        <figcaption class="image-caption">Phối cảnh tổng thể dự án với không gian xanh mát</figcaption>
+      </figure>
       
       <h2 class="article-title">Giải pháp không gian</h2>
       <p class="article-text">Mặt bằng công năng được bố trí khoa học, phân khu rõ ràng nhưng vẫn đảm bảo sự kết nối xuyên suốt. Hệ thống cửa kính lớn không chỉ giúp mở rộng tầm nhìn mà còn mang lại nguồn năng lượng tích cực cho ngôi nhà mỗi ngày.</p>
@@ -152,6 +245,19 @@ export default function AdminProjectEditor() {
         <p class="quote-text">"Tôi thực sự ấn tượng với sự chuyên nghiệp và tận tâm của đội ngũ MAI HUONG ARC. Họ không chỉ lắng nghe mong muốn của tôi mà còn đưa ra những giải pháp thiết kế vượt ngoài mong đợi. Không gian sống mới mang lại cho gia đình tôi cảm giác bình yên và tự hào mỗi khi đón khách."</p>
         <p class="quote-author">- Chủ đầu tư dự án</p>
       </div>
+
+      <style>
+        .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
+        .article-text { font-size: 1.1rem; line-height: 1.8; color: #333; margin-bottom: 1.5rem; }
+        .image-figure { margin: 2rem 0; width: 100%; }
+        .article-image { width: 100%; border-radius: 12px 12px 0 0; display: block; }
+        .image-caption { background-color: #f9f9f9; color: #555; padding: 12px; text-align: center; font-style: italic; font-size: 0.9rem; border-radius: 0 0 12px 12px; margin-top: 0; border: 1px solid #eee; border-top: none; }
+        .article-quote { background-color: #FDFBF7; border-left: 4px solid #9E2A25; padding: 2rem; margin: 2rem 0; border-radius: 0 12px 12px 0; position: relative; }
+        .quote-icon { font-size: 2rem; color: #9E2A25; line-height: 1; margin-bottom: 1rem; }
+        .quote-title { font-weight: bold; color: #7B1E1A; margin-bottom: 0.5rem; }
+        .quote-text { font-family: "Playfair Display", serif; font-size: 1.4rem; font-style: italic; color: #333; margin-bottom: 1rem; line-height: 1.6; }
+        .quote-author { font-weight: bold; color: #7B1E1A; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+      </style>
     `;
 
     const initialContent = projectInfo.content || defaultTemplate;
@@ -240,12 +346,21 @@ export default function AdminProjectEditor() {
         
         <div className="flex items-center gap-3">
           {step === 'builder' && (
-            <button 
-              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer ${isSettingsOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
-            >
-              <Settings size={18} /> Thông tin cơ bản
-            </button>
+            <>
+              <button 
+                onClick={handlePreview}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer text-gray-600 hover:bg-gray-100"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                Xem trước
+              </button>
+              <button 
+                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer ${isSettingsOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                <Settings size={18} /> Thông tin cơ bản
+              </button>
+            </>
           )}
           
           {step === 'info' ? (
@@ -326,17 +441,7 @@ export default function AdminProjectEditor() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Video (Link YouTube/TikTok hoặc Tải lên)</label>
                     <div className="flex gap-2">
-                      <input type="text" value={projectInfo.video} onChange={e => setProjectInfo({...projectInfo, video: e.target.value})} className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all" placeholder="Nhập link hoặc tải video lên..." />
-                      <label className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium cursor-pointer hover:bg-gray-200 transition-colors flex items-center whitespace-nowrap">
-                        <UploadCloud size={18} className="mr-2" /> Tải lên
-                        <input type="file" className="hidden" accept="video/*" onChange={(e) => {
-                          if (e.target.files && e.target.files[0]) {
-                            const file = e.target.files[0];
-                            const videoUrl = URL.createObjectURL(file);
-                            setProjectInfo({...projectInfo, video: videoUrl});
-                          }
-                        }} />
-                      </label>
+                      <input type="text" value={projectInfo.video} onChange={e => setProjectInfo({...projectInfo, video: e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all" placeholder="Nhập link video..." />
                     </div>
                   </div>
                 </div>
@@ -377,13 +482,29 @@ export default function AdminProjectEditor() {
                     )}
                   </div>
                   
-                  <div className="mt-4">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Hoặc nhập URL ảnh trực tiếp:</label>
-                    <div className="flex items-center">
-                      <div className="bg-gray-100 p-3 rounded-l-lg border border-r-0 border-gray-300 text-gray-500">
-                        <ImageIcon size={18} />
-                      </div>
-                      <input type="text" value={projectInfo.thumbnail} onChange={e => setProjectInfo({...projectInfo, thumbnail: e.target.value})} className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all" placeholder="https://..." />
+                  {/* Gallery Management */}
+                  <div className="mt-8 pt-8 border-t border-gray-200">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thư viện ảnh dự án</label>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mb-4">
+                      {projectInfo.gallery && projectInfo.gallery.map((img: string, idx: number) => (
+                        <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                          <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                          <button 
+                            onClick={() => removeGalleryImage(idx)}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                      <label className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--color-wood)] hover:bg-gray-50 transition-all text-gray-400 hover:text-[var(--color-wood)]">
+                        <UploadCloud size={24} className="mb-1" />
+                        <span className="text-xs font-medium">Thêm ảnh</span>
+                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleGalleryFileSelect} />
+                      </label>
+                    </div>
+                    
+                    <div className="flex gap-2">
                     </div>
                   </div>
                 </div>
@@ -464,12 +585,11 @@ export default function AdminProjectEditor() {
         )}
 
         {/* Sidebar Blocks */}
-        <div className={`w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 z-10 shadow-sm transition-opacity duration-300 ${step === 'builder' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 z-10 shadow-sm transition-all duration-300 ${step === 'builder' ? 'translate-x-0' : '-translate-x-full absolute'}`}>
           <div className="p-4 border-b border-gray-200 bg-gray-50">
             <h2 className="font-bold text-sm uppercase tracking-wider text-gray-700">
-              Kéo thả các khối
+              Kéo thả
             </h2>
-            <p className="text-xs text-gray-500 mt-1">Kéo các khối dưới đây vào khung soạn thảo bên phải</p>
           </div>
           <div id="blocks" className="flex-1 overflow-y-auto p-4 custom-grapesjs-blocks"></div>
         </div>
@@ -478,76 +598,147 @@ export default function AdminProjectEditor() {
         <div className={`flex-1 bg-gray-100 overflow-hidden relative transition-opacity duration-300 ${step === 'builder' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <div ref={editorRef} className="absolute inset-0"></div>
         </div>
+
+        {/* Right Sidebar - Style Manager */}
+        <div className={`w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 z-10 shadow-sm transition-all duration-300 ${step === 'builder' ? 'translate-x-0' : 'translate-x-full absolute right-0'}`}>
+          <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 className="font-bold text-sm uppercase tracking-wider text-gray-700">
+              Tùy chỉnh
+            </h2>
+          </div>
+          <div id="styles-container" className="flex-1 overflow-y-auto p-4 custom-grapesjs-styles">
+            <p className="text-xs text-gray-400 text-center mt-4">Chọn một phần tử để chỉnh sửa kiểu dáng</p>
+          </div>
+        </div>
       </div>
-      
-      {/* Custom CSS for GrapesJS Blocks Panel */}
+
+      {/* Preview Modal */}
+      {isPreviewOpen && (
+        <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+          <div className="max-w-5xl mx-auto px-4 py-12">
+            <div className="flex justify-between items-center mb-8 border-b pb-4">
+              <h2 className="text-2xl font-serif font-bold text-[var(--color-wood)]">Xem trước nội dung</h2>
+              <button 
+                onClick={() => setIsPreviewOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-gray-700 font-medium cursor-pointer"
+              >
+                <X size={20} /> Đóng xem trước
+              </button>
+            </div>
+            <div className="prose prose-lg max-w-none">
+              <style>{previewContent.css}</style>
+              <div dangerouslySetInnerHTML={{ __html: previewContent.html }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom CSS for GrapesJS */}
       <style>{`
-        .custom-grapesjs-blocks .gjs-block {
-          width: 100%;
-          min-height: 90px;
-          padding: 15px;
-          margin-bottom: 12px;
-          border-radius: 12px;
-          border: 1px solid #e5e7eb;
-          background: white;
-          color: #374151;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-          cursor: grab;
-          position: relative;
-          overflow: hidden;
-        }
-        .custom-grapesjs-blocks .gjs-block:hover {
-          border-color: var(--color-gold);
-          color: var(--color-wood);
-          box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
-          transform: translateY(-4px);
-        }
-        .custom-grapesjs-blocks .gjs-block:active {
-          cursor: grabbing;
-          transform: translateY(0);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .custom-grapesjs-blocks .gjs-block-label {
-          margin-top: 8px;
-          font-size: 14px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .custom-grapesjs-blocks .gjs-block-category {
-          font-weight: bold;
-          font-size: 12px;
-          text-transform: uppercase;
-          color: #9ca3af;
-          margin-bottom: 12px;
-          padding-bottom: 6px;
-          border-bottom: 1px solid #f3f4f6;
-          width: 100%;
-        }
-        
-        /* Tùy chỉnh khung canvas của GrapesJS để full màn hình */
+        /* ... existing styles ... */
         .gjs-cv-canvas {
-          background-color: #f3f4f6;
           width: 100% !important;
           height: 100% !important;
           top: 0 !important;
           left: 0 !important;
         }
-        .gjs-frame {
-          background-color: white;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-          width: 100% !important;
-          height: 100% !important;
+
+        /* Sidebar Styling */
+        .custom-grapesjs-blocks, .custom-grapesjs-styles {
+          background-color: #ffffff;
         }
-        .gjs-frame-wrapper {
-          padding: 0 !important;
-          width: 100% !important;
-          height: 100% !important;
+
+        /* Block Styling */
+        .custom-grapesjs-blocks .gjs-block {
+          background: #fff;
+          border: 1px solid #e5e7eb;
+          color: #4b5563;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+          transition: all 0.2s ease;
+        }
+        .custom-grapesjs-blocks .gjs-block:hover {
+          border-color: var(--color-gold);
+          color: var(--color-wood);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .custom-grapesjs-blocks .gjs-block-category {
+          background: #f9fafb;
+          color: var(--color-wood);
+          border-bottom: 1px solid #e5e7eb;
+          padding: 8px 12px;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+        }
+
+        /* Style Manager Styling */
+        .gjs-sm-sector {
+          border-bottom: 1px solid #f3f4f6;
+          padding: 12px 0;
+        }
+        .gjs-sm-title {
+          background: #f9fafb;
+          padding: 8px 12px;
+          border-radius: 6px;
+          color: var(--color-wood);
+          font-weight: 600;
+          margin-bottom: 8px;
+          border: 1px solid #f3f4f6;
+        }
+        .gjs-sm-properties {
+          padding: 0 4px;
+        }
+        .gjs-field {
+          background: #fff;
+          border: 1px solid #d1d5db;
+          border-radius: 6px;
+          padding: 6px;
+          transition: border-color 0.2s;
+        }
+        .gjs-field:focus-within {
+          border-color: var(--color-gold);
+          ring: 2px solid var(--color-gold);
+        }
+        .gjs-field input, .gjs-field select {
+          color: #374151;
+          font-size: 13px;
+        }
+        .gjs-sm-label {
+          color: #6b7280;
+          font-size: 12px;
+          font-weight: 500;
+          margin-bottom: 4px;
+        }
+        
+        /* Radio Buttons */
+        .gjs-radio-items {
+          background: #f3f4f6;
+          padding: 3px;
+          border-radius: 6px;
+        }
+        .gjs-radio-item {
+          border-radius: 4px;
+          color: #6b7280;
+        }
+        .gjs-radio-item.gjs-sm-active {
+          background: white;
+          color: var(--color-wood);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #d1d5db;
+          border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #9ca3af;
         }
       `}</style>
     </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Settings, X, UploadCloud, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Save, Settings, X, UploadCloud, Image as ImageIcon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
 
 export default function AdminProjectEditor() {
   const location = useLocation();
@@ -13,6 +13,8 @@ export default function AdminProjectEditor() {
   const [step, setStep] = useState<'info' | 'builder'>('info');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
   const [previewContent, setPreviewContent] = useState({ html: '', css: '' });
   const navigate = useNavigate();
 
@@ -585,7 +587,16 @@ export default function AdminProjectEditor() {
         )}
 
         {/* Sidebar Blocks */}
-        <div className={`w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 z-10 shadow-sm transition-all duration-300 ${step === 'builder' ? 'translate-x-0' : '-translate-x-full absolute'}`}>
+        <div className={`w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 shadow-sm transition-all duration-300 ${step === 'builder' ? (isLeftSidebarOpen ? 'translate-x-0' : '-translate-x-full absolute left-0') : 'hidden'}`}>
+          {step === 'builder' && (
+            <button
+              onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}
+              className="absolute -right-8 top-1/2 -translate-y-1/2 w-8 h-16 bg-white border border-l-0 border-gray-200 rounded-r-lg flex items-center justify-center shadow-sm text-gray-500 hover:text-[var(--color-wood)] hover:bg-gray-50 z-30 cursor-pointer"
+              title={isLeftSidebarOpen ? "Ẩn công cụ" : "Hiện công cụ"}
+            >
+              {isLeftSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
+            </button>
+          )}
           <div className="p-4 border-b border-gray-200 bg-gray-50">
             <h2 className="font-bold text-sm uppercase tracking-wider text-gray-700">
               Kéo thả
@@ -600,7 +611,16 @@ export default function AdminProjectEditor() {
         </div>
 
         {/* Right Sidebar - Style Manager */}
-        <div className={`w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 z-10 shadow-sm transition-all duration-300 ${step === 'builder' ? 'translate-x-0' : 'translate-x-full absolute right-0'}`}>
+        <div className={`w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 z-20 shadow-sm transition-all duration-300 ${step === 'builder' ? (isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full absolute right-0') : 'hidden'}`}>
+          {step === 'builder' && (
+            <button
+              onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+              className="absolute -left-8 top-1/2 -translate-y-1/2 w-8 h-16 bg-white border border-r-0 border-gray-200 rounded-l-lg flex items-center justify-center shadow-sm text-gray-500 hover:text-[var(--color-wood)] hover:bg-gray-50 z-30 cursor-pointer"
+              title={isRightSidebarOpen ? "Ẩn tùy chỉnh" : "Hiện tùy chỉnh"}
+            >
+              {isRightSidebarOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
+            </button>
+          )}
           <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
             <h2 className="font-bold text-sm uppercase tracking-wider text-gray-700">
               Tùy chỉnh
@@ -663,67 +683,97 @@ export default function AdminProjectEditor() {
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         .custom-grapesjs-blocks .gjs-block-category {
-          background: #f9fafb;
-          color: var(--color-wood);
-          border-bottom: 1px solid #e5e7eb;
-          padding: 8px 12px;
-          font-weight: 600;
-          letter-spacing: 0.05em;
+          background: #f9fafb !important;
+          border-bottom: 1px solid #e5e7eb !important;
+        }
+        .custom-grapesjs-blocks .gjs-block-category .gjs-title {
+          color: #111827 !important;
+          font-weight: 600 !important;
+          padding: 12px !important;
+          letter-spacing: 0.05em !important;
+          text-shadow: none !important;
         }
 
         /* Style Manager Styling */
         .gjs-sm-sector {
-          border-bottom: 1px solid #f3f4f6;
-          padding: 12px 0;
+          background-color: #ffffff !important;
+          border-bottom: 1px solid #f3f4f6 !important;
+          padding: 12px 0 !important;
         }
-        .gjs-sm-title {
-          background: #f9fafb;
-          padding: 8px 12px;
-          border-radius: 6px;
-          color: var(--color-wood);
-          font-weight: 600;
-          margin-bottom: 8px;
-          border: 1px solid #f3f4f6;
+        .gjs-sm-sector-title, .gjs-sm-title {
+          background: #f9fafb !important;
+          padding: 8px 12px !important;
+          border-radius: 6px !important;
+          color: #111827 !important;
+          font-weight: 600 !important;
+          margin-bottom: 8px !important;
+          border: 1px solid #f3f4f6 !important;
+          text-shadow: none !important;
         }
         .gjs-sm-properties {
-          padding: 0 4px;
+          padding: 0 4px !important;
+          background-color: #ffffff !important;
+        }
+        .gjs-sm-property {
+          background-color: #ffffff !important;
         }
         .gjs-field {
-          background: #fff;
-          border: 1px solid #d1d5db;
-          border-radius: 6px;
-          padding: 6px;
-          transition: border-color 0.2s;
+          background-color: #ffffff !important;
+          border: 1px solid #d1d5db !important;
+          border-radius: 6px !important;
+          padding: 6px !important;
+          transition: border-color 0.2s !important;
+          color: #374151 !important;
+          box-shadow: none !important;
         }
         .gjs-field:focus-within {
-          border-color: var(--color-gold);
-          ring: 2px solid var(--color-gold);
+          border-color: var(--color-gold) !important;
         }
         .gjs-field input, .gjs-field select {
-          color: #374151;
-          font-size: 13px;
+          color: #374151 !important;
+          font-size: 13px !important;
+          background-color: transparent !important;
         }
         .gjs-sm-label {
-          color: #6b7280;
-          font-size: 12px;
-          font-weight: 500;
-          margin-bottom: 4px;
+          color: #6b7280 !important;
+          font-size: 12px !important;
+          font-weight: 500 !important;
+          margin-bottom: 4px !important;
+          text-shadow: none !important;
         }
         
         /* Radio Buttons */
         .gjs-radio-items {
-          background: #f3f4f6;
-          padding: 3px;
-          border-radius: 6px;
+          background: #f3f4f6 !important;
+          padding: 3px !important;
+          border-radius: 6px !important;
         }
         .gjs-radio-item {
-          border-radius: 4px;
-          color: #6b7280;
+          border-radius: 4px !important;
+          color: #6b7280 !important;
+          background-color: transparent !important;
+          box-shadow: none !important;
         }
         .gjs-radio-item.gjs-sm-active {
-          background: white;
-          color: var(--color-wood);
-          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+          background: white !important;
+          color: var(--color-wood) !important;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+        }
+        
+        /* Color Picker */
+        .gjs-field-colorp {
+          background-color: #ffffff !important;
+        }
+        .gjs-field-colorp-c {
+          background-color: #ffffff !important;
+        }
+        
+        /* Clear buttons */
+        .gjs-sm-clear {
+          color: #9ca3af !important;
+        }
+        .gjs-sm-clear:hover {
+          color: var(--color-wood) !important;
         }
 
         /* Scrollbar */

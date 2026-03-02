@@ -111,7 +111,7 @@ export default function Videos() {
         </div>
         
         <div className="mt-16 text-center">
-          <a href="#" className="inline-flex items-center px-8 py-4 bg-[#FF0000] text-white font-medium rounded-full hover:bg-[#CC0000] transition-all duration-300 shadow-md hover:shadow-lg">
+          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-8 py-4 bg-[#FF0000] text-white font-medium rounded-full hover:bg-[#CC0000] transition-all duration-300 shadow-md hover:shadow-lg">
             Đăng ký kênh Youtube <PlayCircle size={20} className="ml-2" />
           </a>
         </div>

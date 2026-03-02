@@ -172,13 +172,13 @@ export default function Layout() {
             <div>
               <h4 className="text-lg font-serif font-semibold text-[var(--color-wood)] mb-6">Kết nối</h4>
               <div className="flex space-x-4">
-                <a href="#" className="w-10 h-10 rounded-full bg-[var(--color-wood)]/10 text-[var(--color-wood)] flex items-center justify-center hover:bg-[var(--color-wood)] hover:text-white transition-colors">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[var(--color-wood)]/10 text-[var(--color-wood)] flex items-center justify-center hover:bg-[var(--color-wood)] hover:text-white transition-colors">
                   <Facebook size={18} />
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-[var(--color-wood)]/10 text-[var(--color-wood)] flex items-center justify-center hover:bg-[var(--color-wood)] hover:text-white transition-colors">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[var(--color-wood)]/10 text-[var(--color-wood)] flex items-center justify-center hover:bg-[var(--color-wood)] hover:text-white transition-colors">
                   <Instagram size={18} />
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-[var(--color-wood)]/10 text-[var(--color-wood)] flex items-center justify-center hover:bg-[var(--color-wood)] hover:text-white transition-colors">
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[var(--color-wood)]/10 text-[var(--color-wood)] flex items-center justify-center hover:bg-[var(--color-wood)] hover:text-white transition-colors">
                   <Youtube size={18} />
                 </a>
               </div>
@@ -198,7 +198,7 @@ export default function Layout() {
         <a href="tel:0356210970" className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
           <Phone size={20} />
         </a>
-        <a href="#" className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+        <a href="https://zalo.me/0356210970" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
           <span className="font-bold text-sm">Zalo</span>
         </a>
       </div>

@@ -217,59 +217,61 @@ export default function ProjectDetail() {
               </div>
             )}
 
-            {/* Additional Content Section */}
-            <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[var(--color-beige)] mt-12 relative overflow-hidden">
-                {/* Decorative element */}
-                <div className="absolute top-0 left-0 w-2 h-full bg-[var(--color-wood)]"></div>
-                
-                <div className="prose prose-lg max-w-none text-[var(--color-charcoal)]/80 font-light leading-relaxed">
-                  <h3 className="text-3xl font-serif font-bold text-[var(--color-wood)] mb-8">Vật liệu & Thi công</h3>
-                  <p className="mb-6 text-xl leading-relaxed">
-                    <span className="float-left text-6xl font-serif font-bold text-[var(--color-gold)] leading-none mr-3 mt-1">Đ</span>
-                    ể hiện thực hóa bản vẽ thiết kế một cách hoàn hảo nhất, chúng tôi đặc biệt chú trọng vào việc lựa chọn vật liệu và quy trình thi công. Mọi chi tiết từ sàn nhà, ốp tường, đến hệ thống ánh sáng đều được tuyển chọn từ những thương hiệu uy tín, đảm bảo độ bền và tính thẩm mỹ cao nhất.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
-                    <div className="relative group overflow-hidden rounded-2xl">
-                      <img src={`https://loremflickr.com/600/400/interior?lock=${project.id}7`} alt="Material detail 1" className="w-full object-cover aspect-[4/3] m-0 transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
-                      <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                    </div>
-                    <div className="relative group overflow-hidden rounded-2xl">
-                      <img src={`https://loremflickr.com/600/400/interior?lock=${project.id}8`} alt="Material detail 2" className="w-full object-cover aspect-[4/3] m-0 transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
-                      <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                    </div>
-                  </div>
+            {/* Additional Content Section - Only show if no custom content */}
+            {!project.content && !(project.description && project.description.includes('<style>')) && (
+              <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[var(--color-beige)] mt-12 relative overflow-hidden">
+                  {/* Decorative element */}
+                  <div className="absolute top-0 left-0 w-2 h-full bg-[var(--color-wood)]"></div>
                   
-                  <div className="my-12 flex items-center justify-center">
-                    <div className="h-[1px] w-24 bg-[var(--color-gold)]/50"></div>
-                    <div className="mx-4 text-[var(--color-gold)]">✦</div>
-                    <div className="h-[1px] w-24 bg-[var(--color-gold)]/50"></div>
-                  </div>
-
-                  <h3 className="text-3xl font-serif font-bold text-[var(--color-wood)] mt-8 mb-6">Đánh giá từ gia chủ</h3>
-                  <blockquote className="border-l-4 border-[var(--color-gold)] pl-8 italic bg-[var(--color-cream)]/50 p-8 rounded-r-2xl my-8 relative">
-                    <span className="absolute top-4 left-4 text-6xl text-[var(--color-gold)]/20 font-serif leading-none">"</span>
-                    <p className="relative z-10 text-xl text-[var(--color-charcoal)]/90 leading-relaxed">
-                      Tôi thực sự ấn tượng với sự chuyên nghiệp và tận tâm của đội ngũ MAI HUONG ARC. Họ không chỉ lắng nghe mong muốn của tôi mà còn đưa ra những giải pháp thiết kế vượt ngoài mong đợi. Không gian sống mới mang lại cho gia đình tôi cảm giác bình yên và tự hào mỗi khi đón khách.
+                  <div className="prose prose-lg max-w-none text-[var(--color-charcoal)]/80 font-light leading-relaxed">
+                    <h3 className="text-3xl font-serif font-bold text-[var(--color-wood)] mb-8">Vật liệu & Thi công</h3>
+                    <p className="mb-6 text-xl leading-relaxed">
+                      <span className="float-left text-6xl font-serif font-bold text-[var(--color-gold)] leading-none mr-3 mt-1">Đ</span>
+                      ể hiện thực hóa bản vẽ thiết kế một cách hoàn hảo nhất, chúng tôi đặc biệt chú trọng vào việc lựa chọn vật liệu và quy trình thi công. Mọi chi tiết từ sàn nhà, ốp tường, đến hệ thống ánh sáng đều được tuyển chọn từ những thương hiệu uy tín, đảm bảo độ bền và tính thẩm mỹ cao nhất.
                     </p>
-                    <footer className="text-base font-bold text-[var(--color-wood)] mt-6 not-italic flex items-center">
-                      <div className="w-8 h-[1px] bg-[var(--color-wood)] mr-3"></div>
-                      Chủ đầu tư dự án {project.title}
-                    </footer>
-                  </blockquote>
-                  <p className="mb-10 text-lg">
-                    Sự hài lòng của khách hàng chính là thước đo thành công lớn nhất của chúng tôi. Mỗi dự án hoàn thành không chỉ là một công trình kiến trúc, mà còn là một tổ ấm mang đậm dấu ấn cá nhân, nơi lưu giữ những khoảnh khắc hạnh phúc của gia đình.
-                  </p>
-                  
-                  <div className="mt-12 pt-8 border-t border-[var(--color-beige)] flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <div className="text-sm text-[var(--color-charcoal)]/60 font-medium uppercase tracking-wider">
-                      Khám phá thêm các dự án khác
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
+                      <div className="relative group overflow-hidden rounded-2xl">
+                        <img src={`https://loremflickr.com/600/400/interior?lock=${project.id}7`} alt="Material detail 1" className="w-full object-cover aspect-[4/3] m-0 transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                      </div>
+                      <div className="relative group overflow-hidden rounded-2xl">
+                        <img src={`https://loremflickr.com/600/400/interior?lock=${project.id}8`} alt="Material detail 2" className="w-full object-cover aspect-[4/3] m-0 transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                      </div>
                     </div>
-                    <Link to="/projects" className="inline-flex items-center px-8 py-4 bg-[var(--color-wood)] text-white font-medium rounded-full hover:bg-[var(--color-gold)] transition-all duration-300 shadow-md hover:shadow-lg">
-                      Xem thêm dự án <ArrowRight size={20} className="ml-2" />
-                    </Link>
+                    
+                    <div className="my-12 flex items-center justify-center">
+                      <div className="h-[1px] w-24 bg-[var(--color-gold)]/50"></div>
+                      <div className="mx-4 text-[var(--color-gold)]">✦</div>
+                      <div className="h-[1px] w-24 bg-[var(--color-gold)]/50"></div>
+                    </div>
+
+                    <h3 className="text-3xl font-serif font-bold text-[var(--color-wood)] mt-8 mb-6">Đánh giá từ gia chủ</h3>
+                    <blockquote className="border-l-4 border-[var(--color-gold)] pl-8 italic bg-[var(--color-cream)]/50 p-8 rounded-r-2xl my-8 relative">
+                      <span className="absolute top-4 left-4 text-6xl text-[var(--color-gold)]/20 font-serif leading-none">"</span>
+                      <p className="relative z-10 text-xl text-[var(--color-charcoal)]/90 leading-relaxed">
+                        Tôi thực sự ấn tượng với sự chuyên nghiệp và tận tâm của đội ngũ MAI HUONG ARC. Họ không chỉ lắng nghe mong muốn của tôi mà còn đưa ra những giải pháp thiết kế vượt ngoài mong đợi. Không gian sống mới mang lại cho gia đình tôi cảm giác bình yên và tự hào mỗi khi đón khách.
+                      </p>
+                      <footer className="text-base font-bold text-[var(--color-wood)] mt-6 not-italic flex items-center">
+                        <div className="w-8 h-[1px] bg-[var(--color-wood)] mr-3"></div>
+                        Chủ đầu tư dự án {project.title}
+                      </footer>
+                    </blockquote>
+                    <p className="mb-10 text-lg">
+                      Sự hài lòng của khách hàng chính là thước đo thành công lớn nhất của chúng tôi. Mỗi dự án hoàn thành không chỉ là một công trình kiến trúc, mà còn là một tổ ấm mang đậm dấu ấn cá nhân, nơi lưu giữ những khoảnh khắc hạnh phúc của gia đình.
+                    </p>
+                    
+                    <div className="mt-12 pt-8 border-t border-[var(--color-beige)] flex flex-col sm:flex-row items-center justify-between gap-6">
+                      <div className="text-sm text-[var(--color-charcoal)]/60 font-medium uppercase tracking-wider">
+                        Khám phá thêm các dự án khác
+                      </div>
+                      <Link to="/projects" className="inline-flex items-center px-8 py-4 bg-[var(--color-wood)] text-white font-medium rounded-full hover:bg-[var(--color-gold)] transition-all duration-300 shadow-md hover:shadow-lg">
+                        Xem thêm dự án <ArrowRight size={20} className="ml-2" />
+                      </Link>
+                    </div>
                   </div>
-                </div>
               </div>
+            )}
           </div>
 
           {/* Sidebar */}

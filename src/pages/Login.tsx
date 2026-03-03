@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { User, Lock, ArrowRight } from "lucide-react";
 import Logo from "../components/Logo";
+import axios from "axios";
+ 
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -12,8 +14,8 @@ export default function Login() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple hardcoded check
-    if (username === "admin" && password === "admin123") {
+    const rep = axios.post("/api/auth/login", { username, password });
+    if (rep) {
       localStorage.setItem("isAuthenticated", "true");
       navigate("/admin");
     } else {

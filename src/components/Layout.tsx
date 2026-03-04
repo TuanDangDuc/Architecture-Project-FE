@@ -396,7 +396,7 @@ export default function Layout() {
                     className="text-[var(--color-wood)] shrink-0 mt-0.5"
                   />
                   <span>
-                    46 Võ trường Toản , Phường 08, Tp. Đà lạt, Đà Lạt, Vietnam
+                    48 Võ trường Toản , Phường Lâm Viên, Tp. Đà lạt, Đà Lạt, Vietnam
                   </span>
                 </li>
                 <li className="flex items-center space-x-3 text-sm opacity-80">

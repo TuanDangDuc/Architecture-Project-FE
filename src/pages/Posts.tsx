@@ -8,7 +8,7 @@ export default function Posts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/posts")
+    fetch("/api/post")
       .then(res => res.json())
       .then(data => {
         // Filter only published posts

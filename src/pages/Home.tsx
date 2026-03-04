@@ -40,7 +40,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/projects")
+    fetch("/api/project")
       .then((res) => res.json())
       .then((data) => {
         setFeaturedProjects(data.slice(0, 6));

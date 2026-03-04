@@ -63,23 +63,23 @@ export default function Admin() {
     fetch("/api/stats")
       .then((res) => res.json())
       .then(setStats);
-    fetch("/api/projects")
+    fetch("/api/project")
       .then((res) => res.json())
       .then(setProjects);
-    fetch("/api/consultations")
+    fetch("/api/ticket")
       .then((res) => res.json())
       .then(setConsultations);
-    fetch("/api/posts")
+    fetch("/api/post")
       .then((res) => res.json())
       .then(setPosts);
-    fetch("/api/videos")
+    fetch("/api/video")
       .then((res) => res.json())
       .then(setVideos);
   };
 
   const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("/api/projects", {
+    await fetch("/api/project", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newProject),
@@ -108,10 +108,10 @@ export default function Admin() {
     try {
       const endpoint =
         deleteConfirmation.type === "project"
-          ? `/api/projects/${deleteConfirmation.id}`
+          ? `/api/project/${deleteConfirmation.id}`
           : deleteConfirmation.type === "post"
-            ? `/api/posts/${deleteConfirmation.id}`
-            : `/api/videos/${deleteConfirmation.id}`;
+            ? `/api/post/${deleteConfirmation.id}`
+            : `/api/video/${deleteConfirmation.id}`;
 
       const res = await fetch(endpoint, { method: "DELETE" });
       if (res.ok) {
@@ -127,7 +127,7 @@ export default function Admin() {
   };
 
   const handleUpdateConsultationStatus = async (id: number, status: string) => {
-    await fetch(`/api/consultations/${id}/status`, {
+    await fetch(`/api/ticket/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),

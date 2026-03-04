@@ -21,7 +21,7 @@ export default function AdminVideoEditor() {
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    fetch('/api/projects')
+    fetch('/api/project')
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error("Error fetching projects:", err));
@@ -76,13 +76,13 @@ export default function AdminVideoEditor() {
   const handleSave = async () => {
     try {
       if (videoInfo.id) {
-        await fetch(`/api/videos/${videoInfo.id}`, {
+        await fetch(`/api/video/${videoInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(videoInfo)
         });
       } else {
-        await fetch('/api/videos', {
+        await fetch('/api/video', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(videoInfo)

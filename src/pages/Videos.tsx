@@ -8,7 +8,7 @@ export default function Videos() {
   const [videos, setVideos] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/videos")
+    fetch("/api/video")
       .then((res) => res.json())
       .then((data) => {
         // Format data to match UI requirements

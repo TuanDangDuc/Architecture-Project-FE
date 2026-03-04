@@ -11,7 +11,7 @@ export default function ProjectDetail() {
   const [selectedVideo, setSelectedVideo] = useState<{url: string, type: string} | null>(null);
 
   useEffect(() => {
-    fetch(`/api/projects/${id}`)
+    fetch(`/api/project/${id}`)
       .then(res => res.json())
       .then(data => {
         setProject(data);

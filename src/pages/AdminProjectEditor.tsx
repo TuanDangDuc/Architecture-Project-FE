@@ -308,14 +308,14 @@ export default function AdminProjectEditor() {
     try {
       if (projectInfo.id) {
         // Update existing project
-        await fetch(`/api/projects/${projectInfo.id}`, {
+        await fetch(`/api/project/${projectInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(projectData)
         });
       } else {
         // Create new project
-        await fetch('/api/projects', {
+        await fetch('/api/project', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(projectData)

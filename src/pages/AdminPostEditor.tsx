@@ -248,13 +248,13 @@ export default function AdminPostEditor() {
     
     try {
       if (postInfo.id) {
-        await fetch(`/api/posts/${postInfo.id}`, {
+        await fetch(`/api/post/${postInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(postData)
         });
       } else {
-        await fetch('/api/posts', {
+        await fetch('/api/post', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(postData)

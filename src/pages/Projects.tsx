@@ -17,7 +17,7 @@ export default function Portfolio() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/projects")
+    fetch("/api/project")
       .then(res => res.json())
       .then(data => {
         setProjects(data);

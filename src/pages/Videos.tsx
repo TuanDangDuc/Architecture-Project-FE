@@ -8,33 +8,35 @@ export default function Videos() {
   const [videos, setVideos] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/videos')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/videos")
+      .then((res) => res.json())
+      .then((data) => {
         // Format data to match UI requirements
         const formattedVideos = data.map((video: any) => ({
           ...video,
           id: video.id,
           title: video.title,
-          thumbnail: video.thumbnail || `https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`,
+          thumbnail:
+            video.thumbnail ||
+            `https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`,
           duration: video.duration,
           views: formatViews(video.views),
-          date: new Date(video.created_at).toLocaleDateString('vi-VN'),
+          date: new Date(video.created_at).toLocaleDateString("vi-VN"),
           category: video.category,
           youtubeId: video.youtube_id,
-          projectId: video.project_id
+          projectId: video.project_id,
         }));
         setVideos(formattedVideos);
       })
-      .catch(err => console.error("Error fetching videos:", err));
+      .catch((err) => console.error("Error fetching videos:", err));
   }, []);
 
   const formatViews = (num: number) => {
     if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
+      return (num / 1000000).toFixed(1) + "M";
     }
     if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
+      return (num / 1000).toFixed(1) + "K";
     }
     return num.toString();
   };
@@ -42,12 +44,12 @@ export default function Videos() {
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (activeVideo) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [activeVideo]);
 
@@ -55,9 +57,12 @@ export default function Videos() {
     <div className="bg-[var(--color-cream)] min-h-screen py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-[var(--color-wood)] mb-6">Video Review Dự Án</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-[var(--color-wood)] mb-6">
+            Video Review Dự Án
+          </h1>
           <p className="text-lg text-[var(--color-charcoal)]/70 max-w-2xl mx-auto font-light">
-            Trải nghiệm không gian sống thực tế qua các video review chi tiết về những dự án đã hoàn thiện của chúng tôi.
+            Trải nghiệm không gian sống thực tế qua các video review chi tiết về
+            những dự án đã hoàn thiện của chúng tôi.
           </p>
         </div>
 
@@ -71,7 +76,7 @@ export default function Videos() {
               transition={{ duration: 0.5, delay: Math.min(index * 0.1, 0.3) }}
               className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-[var(--color-beige)] group"
             >
-              <div 
+              <div
                 className="relative aspect-video overflow-hidden cursor-pointer"
                 onClick={() => setActiveVideo(video)}
               >
@@ -83,7 +88,10 @@ export default function Videos() {
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                  <PlayCircle size={64} className="text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 drop-shadow-lg" />
+                  <PlayCircle
+                    size={64}
+                    className="text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 drop-shadow-lg"
+                  />
                 </div>
                 <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded-md backdrop-blur-sm">
                   {video.duration}
@@ -95,23 +103,32 @@ export default function Videos() {
                 </div>
               </div>
               <div className="p-6">
-                <h2 
+                <h2
                   className="text-xl font-serif font-bold text-[var(--color-charcoal)] group-hover:text-[var(--color-wood)] transition-colors line-clamp-2 mb-4 cursor-pointer"
                   onClick={() => setActiveVideo(video)}
                 >
                   {video.title}
                 </h2>
                 <div className="flex items-center justify-between text-xs text-[var(--color-charcoal)]/60">
-                  <span className="flex items-center"><Eye size={14} className="mr-1" /> {video.views} lượt xem</span>
-                  <span className="flex items-center"><Calendar size={14} className="mr-1" /> {video.date}</span>
+                  <span className="flex items-center">
+                    <Eye size={14} className="mr-1" /> {video.views} lượt xem
+                  </span>
+                  <span className="flex items-center">
+                    <Calendar size={14} className="mr-1" /> {video.date}
+                  </span>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
-        
+
         <div className="mt-16 text-center">
-          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-8 py-4 bg-[#FF0000] text-white font-medium rounded-full hover:bg-[#CC0000] transition-all duration-300 shadow-md hover:shadow-lg">
+          <a
+            href="https://youtube.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-8 py-4 bg-[#FF0000] text-white font-medium rounded-full hover:bg-[#CC0000] transition-all duration-300 shadow-md hover:shadow-lg"
+          >
             Đăng ký kênh Youtube <PlayCircle size={20} className="ml-2" />
           </a>
         </div>
@@ -127,13 +144,13 @@ export default function Videos() {
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8"
             onClick={() => setActiveVideo(null)}
           >
-            <button 
-              className="absolute top-4 right-4 md:top-8 md:right-8 text-white/70 hover:text-white transition-colors"
+            <button
+              className="absolute top-4 right-4 md:top-8 md:right-8 text-white/70 hover:text-white transition-colors cursor-pointer"
               onClick={() => setActiveVideo(null)}
             >
               <X size={32} />
             </button>
-            
+
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -151,7 +168,7 @@ export default function Videos() {
                   className="absolute inset-0 w-full h-full border-0"
                 ></iframe>
               </div>
-              
+
               <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -166,9 +183,9 @@ export default function Videos() {
                     {activeVideo.title}
                   </h3>
                 </div>
-                
+
                 {activeVideo.projectId && (
-                  <Link 
+                  <Link
                     to={`/projects/${activeVideo.projectId}`}
                     className="shrink-0 inline-flex items-center justify-center px-6 py-3 bg-[var(--color-wood)] text-white font-medium rounded-full hover:bg-[var(--color-gold)] transition-colors shadow-md"
                     onClick={() => setActiveVideo(null)}

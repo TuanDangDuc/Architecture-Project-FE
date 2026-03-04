@@ -18,10 +18,7 @@ export default defineConfig(({ mode }) => {
     server: {
       hmr: process.env.DISABLE_HMR !== "true",
       proxy: {
-        "/api": {
-          target: "https://103.47.225.125:8080",
-          changeOrigin: true,
-        },
+     
       },
     },
   };

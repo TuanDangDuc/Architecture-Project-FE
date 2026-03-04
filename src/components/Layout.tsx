@@ -454,7 +454,7 @@ export default function Layout() {
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <Link
-                to="/admin"
+                to="/login"
                 className="hover:text-[var(--color-wood)] transition-colors font-medium"
               >
                 Admin CMS

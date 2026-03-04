@@ -308,14 +308,14 @@ export default function AdminProjectEditor() {
     try {
       if (projectInfo.id) {
         // Update existing project
-        await fetch(`/api/project/${projectInfo.id}`, {
+        await fetch(`https://api.kientrucmaihuong.com/api/project/${projectInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(projectData)
         });
       } else {
         // Create new project
-        await fetch('/api/project', {
+        await fetch('https://api.kientrucmaihuong.com/api/project', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(projectData)

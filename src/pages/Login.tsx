@@ -15,7 +15,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const rep = await axios.post("/api/account/login", {
+      const rep = await axios.post("https://api.kientrucmaihuong.com/api/account/login", {
         username,
         password,
       });

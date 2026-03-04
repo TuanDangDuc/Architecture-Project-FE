@@ -60,26 +60,26 @@ export default function Admin() {
   }, []);
 
   const fetchData = () => {
-    fetch("/api/stats")
+    fetch("https://api.kientrucmaihuong.com/api/stats")
       .then((res) => res.json())
       .then(setStats);
-    fetch("/api/project")
+    fetch("https://api.kientrucmaihuong.com/api/project")
       .then((res) => res.json())
       .then(setProjects);
-    fetch("/api/ticket")
+    fetch("https://api.kientrucmaihuong.com/api/ticket")
       .then((res) => res.json())
       .then(setConsultations);
-    fetch("/api/post")
+    fetch("https://api.kientrucmaihuong.com/api/post")
       .then((res) => res.json())
       .then(setPosts);
-    fetch("/api/video")
+    fetch("https://api.kientrucmaihuong.com/api/video")
       .then((res) => res.json())
       .then(setVideos);
   };
 
   const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("/api/project", {
+    await fetch("https://api.kientrucmaihuong.com/api/project", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newProject),
@@ -108,10 +108,10 @@ export default function Admin() {
     try {
       const endpoint =
         deleteConfirmation.type === "project"
-          ? `/api/project/${deleteConfirmation.id}`
+          ? `https://api.kientrucmaihuong.com/api/project/${deleteConfirmation.id}`
           : deleteConfirmation.type === "post"
-            ? `/api/post/${deleteConfirmation.id}`
-            : `/api/video/${deleteConfirmation.id}`;
+            ? `https://api.kientrucmaihuong.com/api/post/${deleteConfirmation.id}`
+            : `https://api.kientrucmaihuong.com/api/video/${deleteConfirmation.id}`;
 
       const res = await fetch(endpoint, { method: "DELETE" });
       if (res.ok) {
@@ -127,7 +127,7 @@ export default function Admin() {
   };
 
   const handleUpdateConsultationStatus = async (id: number, status: string) => {
-    await fetch(`/api/ticket/${id}/status`, {
+    await fetch(`https://api.kientrucmaihuong.com/api/ticket/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),

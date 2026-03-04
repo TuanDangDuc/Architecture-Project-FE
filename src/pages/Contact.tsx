@@ -20,7 +20,7 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/ticket", {
+      const res = await fetch("https://api.kientrucmaihuong.com/api/ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)

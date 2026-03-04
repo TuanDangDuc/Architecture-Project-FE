@@ -13,7 +13,7 @@ export default function PostDetail() {
   useEffect(() => {
     setLoading(true);
     // Fetch current post
-    fetch(`/api/post/${id}`)
+    fetch(`https://api.kientrucmaihuong.com/api/post/${id}`)
       .then(res => {
         if (!res.ok) throw new Error("Not found");
         return res.json();
@@ -21,7 +21,7 @@ export default function PostDetail() {
       .then(data => {
         setPost(data);
         // Fetch all posts to filter related and recent
-        return fetch('/api/post');
+        return fetch('https://api.kientrucmaihuong.com/api/post');
       })
       .then(res => res.json())
       .then(allPosts => {

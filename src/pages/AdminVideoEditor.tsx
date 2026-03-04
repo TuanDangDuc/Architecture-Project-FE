@@ -21,7 +21,7 @@ export default function AdminVideoEditor() {
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    fetch('/api/project')
+    fetch('https://api.kientrucmaihuong.com/api/project')
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error("Error fetching projects:", err));
@@ -76,13 +76,13 @@ export default function AdminVideoEditor() {
   const handleSave = async () => {
     try {
       if (videoInfo.id) {
-        await fetch(`/api/video/${videoInfo.id}`, {
+        await fetch(`https://api.kientrucmaihuong.com/api/video/${videoInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(videoInfo)
         });
       } else {
-        await fetch('/api/video', {
+        await fetch('https://api.kientrucmaihuong.com/api/video', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(videoInfo)

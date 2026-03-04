@@ -18,7 +18,11 @@ export default defineConfig(({ mode }) => {
     server: {
       hmr: process.env.DISABLE_HMR !== "true",
       proxy: {
-     
+        "/api": {
+          target: "https://api.kientrucmaihuong.com/",
+          changeOrigin: true,
+          secure: false,
+        },
       },
     },
   };

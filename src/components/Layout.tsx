@@ -421,7 +421,7 @@ export default function Layout() {
               </h4>
               <div className="flex space-x-4">
                 <a
-                  href="https://facebook.com"
+                  href="https://www.facebook.com/MAIHUONGARC"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-[var(--color-wood)]/10 text-[var(--color-wood)] flex items-center justify-center hover:bg-[var(--color-wood)] hover:text-white transition-colors"

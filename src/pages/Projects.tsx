@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 
 const categories = [
@@ -11,10 +11,72 @@ const categories = [
   "Dịch vụ khác"
 ];
 
+const categoryMap: Record<string, string> = {
+  // Slugs từ Menu Layout
+  "nha-gac-lung-san-vuon": "Nhà vườn",
+  "nha-vuon-mai-nhat": "Nhà vườn",
+  "nha-vuon-mai-bang": "Nhà vườn",
+  "nha-vuon-mai-truyen-thong": "Nhà vườn",
+  "nha-vuon-mai-thai": "Nhà vườn",
+  "thuc-te-nha-vuon": "Nhà vườn",
+  "nha-pho-gac-lung": "Nhà phố",
+  "nha-pho-1-tang": "Nhà phố",
+  "nha-pho-2-tang": "Nhà phố",
+  "nha-pho-3-tang": "Nhà phố",
+  "nha-pho-4-tang": "Nhà phố",
+  "thuc-te-nha-pho": "Nhà phố",
+  "biet-thu-2-tang": "Biệt thự",
+  "biet-thu-3-tang": "Biệt thự",
+  "biet-thu-4-tang": "Biệt thự",
+  "thuc-te-biet-thu": "Biệt thự",
+  "cafe": "Dịch vụ khác",
+  "homestay": "Dịch vụ khác",
+  "khach-san": "Dịch vụ khác",
+  "spa": "Dịch vụ khác",
+  // Slugs khi chuyển tab
+  "nha-pho": "Nhà phố",
+  "biet-thu": "Biệt thự",
+  "nha-vuon": "Nhà vườn",
+  "noi-that": "Nội thất",
+  "dich-vu-khac": "Dịch vụ khác",
+};
+
+const reverseCategoryMap: Record<string, string> = {
+  "Nhà phố": "nha-pho",
+  "Biệt thự": "biet-thu",
+  "Nhà vườn": "nha-vuon",
+  "Nội thất": "noi-that",
+  "Dịch vụ khác": "dich-vu-khac"
+};
+
 export default function Portfolio() {
   const [projects, setProjects] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const initialCatParam = searchParams.get("category");
+  const initialCategory = initialCatParam ? (categoryMap[initialCatParam] || "Tất cả") : "Tất cả";
+
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Đồng bộ khi URL thay đổi (nhấn từ menu Dropdown khi đang ở màn Projects)
+  useEffect(() => {
+    const currentCatParam = searchParams.get("category");
+    if (currentCatParam) {
+      setActiveCategory(categoryMap[currentCatParam] || "Tất cả");
+    } else {
+      setActiveCategory("Tất cả");
+    }
+  }, [searchParams]);
+
+  const handleCategoryClick = (cat: string) => {
+    setActiveCategory(cat);
+    if (cat === "Tất cả") {
+      setSearchParams({});
+    } else {
+      setSearchParams({ category: reverseCategoryMap[cat] || "" });
+    }
+  };
 
   useEffect(() => {
     fetch("https://api.kientrucmaihuong.com/api/project")
@@ -45,7 +107,7 @@ export default function Portfolio() {
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => handleCategoryClick(cat)}
               className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                 activeCategory === cat
                   ? "bg-[var(--color-wood)] text-white shadow-md"

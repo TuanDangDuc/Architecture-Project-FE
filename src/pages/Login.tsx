@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api'; // re-trigger HMR
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
@@ -15,13 +16,16 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const rep = await axios.post("https://api.kientrucmaihuong.com/api/account/login", {
+      const rep = await axios.post(`${API_BASE}/api/account/login`, {
         username,
         password,
       });
 
       if (rep.status === 200) {
         localStorage.setItem("isAuthenticated", "true");
+        if (rep.data && rep.data.id) {
+          localStorage.setItem("adminId", rep.data.id);
+        }
         console.log("Login successful");
         navigate("/admin");
       }

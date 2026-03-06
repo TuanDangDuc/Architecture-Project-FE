@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useEffect, useRef, useState } from 'react';
 import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
@@ -248,13 +249,13 @@ export default function AdminPostEditor() {
     
     try {
       if (postInfo.id) {
-        await fetch(`https://api.kientrucmaihuong.com/api/post/${postInfo.id}`, {
+        await fetch(`${API_BASE}/api/post/${postInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(postData)
         });
       } else {
-        await fetch('https://api.kientrucmaihuong.com/api/post', {
+        await fetch(`${API_BASE}/api/post`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(postData)

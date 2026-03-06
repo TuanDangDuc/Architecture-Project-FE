@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "motion/react";
@@ -13,7 +14,7 @@ export default function PostDetail() {
   useEffect(() => {
     setLoading(true);
     // Fetch current post
-    fetch(`https://api.kientrucmaihuong.com/api/post/${id}`)
+    fetch(`${API_BASE}/api/post/${id}`)
       .then(res => {
         if (!res.ok) throw new Error("Not found");
         return res.json();
@@ -21,7 +22,7 @@ export default function PostDetail() {
       .then(data => {
         setPost(data);
         // Fetch all posts to filter related and recent
-        return fetch('https://api.kientrucmaihuong.com/api/post');
+        return fetch(`${API_BASE}/api/post`);
       })
       .then(res => res.json())
       .then(allPosts => {

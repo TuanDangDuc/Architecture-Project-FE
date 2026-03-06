@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -11,7 +12,7 @@ export default function ProjectDetail() {
   const [selectedVideo, setSelectedVideo] = useState<{url: string, type: string} | null>(null);
 
   useEffect(() => {
-    fetch(`https://api.kientrucmaihuong.com/api/project/${id}`)
+    fetch(`${API_BASE}/api/project/${id}`)
       .then(res => res.json())
       .then(data => {
         setProject(data);
@@ -67,7 +68,7 @@ export default function ProjectDetail() {
   const galleryImages = project.gallery && project.gallery.length > 0 
     ? [project.thumbnail, ...project.gallery] 
     : [
-        project.thumbnail || `https://loremflickr.com/1920/1080/architecture?lock=${project.id}`,
+        project.titleImage || `https://loremflickr.com/1920/1080/architecture?lock=${project.id}`,
         `https://loremflickr.com/1920/1080/interior?lock=${project.id}1`,
         `https://loremflickr.com/1920/1080/interior?lock=${project.id}2`,
         `https://loremflickr.com/1920/1080/interior?lock=${project.id}3`,
@@ -87,7 +88,7 @@ export default function ProjectDetail() {
             <ArrowLeft size={16} className="mr-2" /> Trở về danh sách
           </Link>
           <span className="mx-3">/</span>
-          <span className="text-[var(--color-wood)]">{project.title}</span>
+          <span className="text-[var(--color-wood)]">{project.name}</span>
         </div>
 
         {/* Title Section */}
@@ -96,11 +97,11 @@ export default function ProjectDetail() {
             {project.category}
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[var(--color-wood)] mb-4 leading-tight">
-            {project.title}
+            {project.name}
           </h1>
           <div className="flex flex-wrap items-center gap-6 text-[var(--color-charcoal)]/70 font-medium">
             <div className="flex items-center"><Ruler size={18} className="mr-2 text-[var(--color-gold)]" /> {project.area} m²</div>
-            <div className="flex items-center"><DollarSign size={18} className="mr-2 text-[var(--color-gold)]" /> {project.cost || "Liên hệ"}</div>
+            <div className="flex items-center"><DollarSign size={18} className="mr-2 text-[var(--color-gold)]" /> {project.constructionCost || "Liên hệ"}</div>
             <div className="flex items-center"><Tag size={18} className="mr-2 text-[var(--color-gold)]" /> {project.style}</div>
           </div>
         </div>
@@ -111,7 +112,7 @@ export default function ProjectDetail() {
           <div className="lg:w-3/4 relative aspect-video rounded-2xl overflow-hidden bg-[var(--color-beige)] shadow-md group">
             <img 
               src={galleryImages[activeImage]} 
-              alt={project.title} 
+              alt={project.name} 
               className="w-full h-full object-cover transition-opacity duration-500"
               referrerPolicy="no-referrer"
             />
@@ -161,7 +162,7 @@ export default function ProjectDetail() {
                 ) : (
                   <div className="prose prose-lg max-w-none text-[var(--color-charcoal)]/80 font-light leading-relaxed">
                     <p className="mb-6">
-                      Dự án <strong>{project.title}</strong> là một tuyệt tác kiến trúc mang đậm dấu ấn cá nhân, kết hợp hài hòa giữa công năng sử dụng và thẩm mỹ tinh tế. Không gian được thiết kế mở, đón trọn ánh sáng tự nhiên, tạo cảm giác thoáng đãng và gần gũi với thiên nhiên.
+                      Dự án <strong>{project.name}</strong> là một tuyệt tác kiến trúc mang đậm dấu ấn cá nhân, kết hợp hài hòa giữa công năng sử dụng và thẩm mỹ tinh tế. Không gian được thiết kế mở, đón trọn ánh sáng tự nhiên, tạo cảm giác thoáng đãng và gần gũi với thiên nhiên.
                     </p>
                     <img src={`https://loremflickr.com/800/500/interior?lock=${project.id}5`} alt="Interior detail" className="w-full rounded-2xl my-8 object-cover aspect-[16/9]" referrerPolicy="no-referrer" />
                     <h3 className="text-xl font-serif font-bold text-[var(--color-wood)] mt-8 mb-4">Ý tưởng thiết kế</h3>
@@ -206,7 +207,7 @@ export default function ProjectDetail() {
                         </div>
                       </div>
                       <h4 className="font-serif font-bold text-lg text-[var(--color-charcoal)] group-hover:text-[var(--color-gold)] transition-colors">
-                        Khám phá không gian thực tế {project.title} {videos.length > 1 ? `- Phần ${idx + 1}` : ''}
+                        Khám phá không gian thực tế {project.name} {videos.length > 1 ? `- Phần ${idx + 1}` : ''}
                       </h4>
                       <p className="text-sm text-[var(--color-charcoal)]/60 mt-1 flex items-center">
                         <Calendar size={14} className="mr-1" /> {new Date().toLocaleDateString('vi-VN')}
@@ -254,7 +255,7 @@ export default function ProjectDetail() {
                       </p>
                       <footer className="text-base font-bold text-[var(--color-wood)] mt-6 not-italic flex items-center">
                         <div className="w-8 h-[1px] bg-[var(--color-wood)] mr-3"></div>
-                        Chủ đầu tư dự án {project.title}
+                        Chủ đầu tư dự án {project.name}
                       </footer>
                     </blockquote>
                     <p className="mb-10 text-lg">

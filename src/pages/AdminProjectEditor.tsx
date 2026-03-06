@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Settings, X, UploadCloud, Image as ImageIcon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { Save, Plus, Trash2, Link, Image as ImageIcon, Video, FileText, ArrowLeft, UploadCloud, X, Settings, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { API_BASE } from '../config/api';
 
 export default function AdminProjectEditor() {
   const location = useLocation();
@@ -30,20 +31,53 @@ export default function AdminProjectEditor() {
   
   const [projectInfo, setProjectInfo] = useState({
     id: editProject?.id || null,
-    title: editProject?.title || "", 
-    category: editProject?.category || "Nhà phố", 
-    style: editProject?.style || "", 
+    title: editProject?.name || "", 
+    category: editProject?.category?.name || "", 
+    style: editProject?.style || "MODERN", 
     area: editProject?.area || "", 
-    cost: editProject?.cost || "", 
-    thumbnail: editProject?.thumbnail || "",
-    gallery: editProject?.gallery || [],
+    cost: editProject?.constructionCost || "", 
+    thumbnail: editProject?.titleImage || "",
+    gallery: editProject?.images?.map((img: any) => img.url) || [],
     description: editProject?.description || "",
     content: editProject?.content || "",
     video: editProject?.video || ""
   });
   
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
+
+  useEffect(() => {
+    fetch('https://api.kientrucmaihuong.com/api/category')
+      .then(res => res.json())
+      .then(data => {
+        setCategories(data);
+        if (data.length > 0 && !projectInfo.category) {
+          setProjectInfo(prev => ({ ...prev, category: data[0].name }));
+        }
+      })
+      .catch(err => console.error("Lỗi tải danh mục:", err));
+  }, []);
+  
   const [isDragging, setIsDragging] = useState(false);
   const [newGalleryUrl, setNewGalleryUrl] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+
+  const uploadImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch(`${API_BASE}/api/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.url;
+      }
+    } catch (e) {
+      console.error("Lỗi upload ảnh:", e);
+    }
+    return null;
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -54,53 +88,58 @@ export default function AdminProjectEditor() {
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setIsUploading(true);
       const file = e.dataTransfer.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProjectInfo({...projectInfo, thumbnail: reader.result as string});
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadImage(file);
+      if (url) {
+        setProjectInfo({...projectInfo, thumbnail: url});
+      } else {
+        alert("Có lỗi xảy ra khi tải ảnh lên.");
+      }
+      setIsUploading(false);
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      setIsUploading(true);
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProjectInfo({...projectInfo, thumbnail: reader.result as string});
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadImage(file);
+      if (url) {
+        setProjectInfo({...projectInfo, thumbnail: url});
+      } else {
+        alert("Có lỗi xảy ra khi tải ảnh lên.");
+      }
+      setIsUploading(false);
     }
   };
 
-  const handleGalleryFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      setIsUploading(true);
       const files = Array.from(e.target.files);
       const newImages: string[] = [];
       
-      let processedCount = 0;
-      files.forEach((file: File) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (reader.result) {
-            newImages.push(reader.result as string);
-          }
-          processedCount++;
-          if (processedCount === files.length) {
-            setProjectInfo(prev => ({
-              ...prev,
-              gallery: [...(prev.gallery || []), ...newImages]
-            }));
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+      for (const fileItem of files) {
+        const file = fileItem as File;
+        const url = await uploadImage(file);
+        if (url) {
+          newImages.push(url);
+        }
+      }
+      
+      if (newImages.length > 0) {
+        setProjectInfo(prev => ({
+          ...prev,
+          gallery: [...(prev.gallery || []), ...newImages]
+        }));
+      }
+      setIsUploading(false);
     }
   };
 
@@ -129,6 +168,11 @@ export default function AdminProjectEditor() {
       height: '100%',
       width: 'auto',
       storageManager: false,
+      assetManager: {
+        upload: `${API_BASE}/api/upload`,
+        uploadName: 'file',
+        autoAdd: true,
+      },
       selectorManager: { componentFirst: true },
       styleManager: {
         appendTo: '#styles-container',
@@ -283,6 +327,23 @@ export default function AdminProjectEditor() {
       }
     });
 
+    // Custom upload handling for GrapesJS Asset Manager
+    e.on('asset:upload:start', () => {
+      // Optional: show loading state
+    });
+
+    e.on('asset:upload:response', (response) => {
+      if (response && response.url) {
+        // GrapesJS Asset Manager expects the response to be mapped to { data: [...] }
+        return { data: [response.url] };
+      }
+    });
+
+    e.on('asset:upload:error', (err) => {
+      console.error('Lỗi upload trong GrapesJS:', err);
+      alert('Không thể tải ảnh này lên máy chủ. Vui lòng thử lại.');
+    });
+
     setEditor(e);
 
     return () => {
@@ -300,33 +361,70 @@ export default function AdminProjectEditor() {
       fullContent = `<style>${css}</style>${html}`;
     }
     
+    const adminIdFromStorage = localStorage.getItem("adminId");
+    const MOCK_ADMIN_ID = adminIdFromStorage || "3368b6b0-fa6f-409b-a6df-d91834164bba"; // Temporarily hardcoded for API constraint
+    
+    // Find category ID based on selected name
+    const selectedCat = categories.find(c => c.name === projectInfo.category);
+    const mappedCategoryId = selectedCat?.id || (categories.length > 0 ? categories[0].id : null);
+
+    // Map user-friendly category names to Backend Enum Type 
+    // Backend Enum Type: HOUSE, VILLA, APARTMENT, CAFE, RESTAURANT, HOTEL, OFFICE, HOMESTAY, SHOP, RESORT
+    let mappedType = "HOUSE";
+    if (projectInfo.category.includes("Biệt thự")) mappedType = "VILLA";
+    else if (projectInfo.category.includes("Nhà vườn")) mappedType = "HOMESTAY";
+    else if (projectInfo.category.includes("Nhà phố")) mappedType = "HOUSE";
+    else if (projectInfo.category.includes("Nội thất")) mappedType = "APARTMENT"; // Default mapping to pass validation
+
+    // Validate safe Backend Enum Style (MODERN, CLASSIC, NEOCLASSIC, MINIMALIST, INDUSTRIAL, SCANDINAVIAN, JAPANESE, TROPICAL)
+    let mappedStyle = "MODERN";
+    const rawStyle = projectInfo.style.toUpperCase();
+    if (["CLASSIC", "NEOCLASSIC", "MINIMALIST", "INDUSTRIAL", "SCANDINAVIAN", "JAPANESE", "TROPICAL"].includes(rawStyle)) {
+      mappedStyle = rawStyle;
+    }
+
     const projectData = {
-      ...projectInfo,
-      content: fullContent
+      name: projectInfo.title,
+      area: parseInt(projectInfo.area) || 0,
+      constructionCost: parseFloat(projectInfo.cost) || 0,
+      style: mappedStyle,
+      titleImage: projectInfo.thumbnail,
+      type: mappedType,
+      slug: projectInfo.title.toLowerCase().replace(/ /g, '-'),
+      content: fullContent,
+      status: "ACTIVE",
+      categoryId: mappedCategoryId,
+      adminId: MOCK_ADMIN_ID,
+      images: projectInfo.gallery || []
     };
     
     try {
+      let res;
       if (projectInfo.id) {
         // Update existing project
-        await fetch(`https://api.kientrucmaihuong.com/api/project/${projectInfo.id}`, {
+        res = await fetch(`https://api.kientrucmaihuong.com/api/project/${projectInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(projectData)
+          body: JSON.stringify({ ...projectData, id: projectInfo.id })
         });
       } else {
         // Create new project
-        await fetch('https://api.kientrucmaihuong.com/api/project', {
+        res = await fetch('https://api.kientrucmaihuong.com/api/project', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(projectData)
         });
       }
       
+      if (!res.ok) {
+        throw new Error(`API Error: ${res.status}`);
+      }
+
       alert("Đã lưu dự án thành công!");
       navigate('/admin');
     } catch (error) {
       console.error("Lỗi khi lưu:", error);
-      alert("Có lỗi xảy ra khi lưu.");
+      alert("Có lỗi xảy ra khi lưu dự án. Vui lòng kiểm tra lại thông tin.");
     }
   };
 
@@ -416,16 +514,23 @@ export default function AdminProjectEditor() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Danh mục</label>
                       <select value={projectInfo.category} onChange={e => setProjectInfo({...projectInfo, category: e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all cursor-pointer">
-                        <option>Nhà phố</option>
-                        <option>Biệt thự</option>
-                        <option>Nhà vườn</option>
-                        <option>Nội thất</option>
-                        <option>Dịch vụ khác</option>
+                        {categories.map((cat) => (
+                          <option key={cat.id} value={cat.name}>{cat.name}</option>
+                        ))}
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Phong cách</label>
-                      <input type="text" value={projectInfo.style} onChange={e => setProjectInfo({...projectInfo, style: e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all" placeholder="Modern, Classic..." />
+                      <select value={projectInfo.style} onChange={e => setProjectInfo({...projectInfo, style: e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all cursor-pointer">
+                        <option value="MODERN">Hiện đại (Modern)</option>
+                        <option value="CLASSIC">Cổ điển (Classic)</option>
+                        <option value="NEOCLASSIC">Tân cổ điển (Neoclassic)</option>
+                        <option value="MINIMALIST">Tối giản (Minimalist)</option>
+                        <option value="INDUSTRIAL">Công nghiệp (Industrial)</option>
+                        <option value="SCANDINAVIAN">Bắc Âu (Scandinavian)</option>
+                        <option value="JAPANESE">Nhật Bản (Japanese)</option>
+                        <option value="TROPICAL">Nhiệt đới (Tropical)</option>
+                      </select>
                     </div>
                   </div>
                   
@@ -464,8 +569,8 @@ export default function AdminProjectEditor() {
                         <img src={projectInfo.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <label className="px-4 py-2 bg-white text-gray-800 rounded-lg font-medium cursor-pointer hover:bg-gray-100 transition-colors">
-                            Đổi ảnh khác
-                            <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
+                            {isUploading ? "Đang tải lên..." : "Đổi ảnh khác"}
+                            <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={isUploading} />
                           </label>
                         </div>
                       </div>
@@ -474,11 +579,13 @@ export default function AdminProjectEditor() {
                         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 text-[var(--color-wood)]">
                           <UploadCloud size={32} />
                         </div>
-                        <p className="text-gray-600 font-medium mb-1">Kéo thả ảnh vào đây</p>
+                        <p className="text-gray-600 font-medium mb-1">
+                          {isUploading ? "Đang tải lên..." : "Kéo thả ảnh vào đây"}
+                        </p>
                         <p className="text-sm text-gray-400 mb-4">hoặc</p>
                         <label className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium cursor-pointer hover:bg-gray-50 transition-colors shadow-sm">
                           Chọn ảnh từ máy tính
-                          <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
+                          <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={isUploading} />
                         </label>
                       </>
                     )}
@@ -501,8 +608,8 @@ export default function AdminProjectEditor() {
                       ))}
                       <label className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--color-wood)] hover:bg-gray-50 transition-all text-gray-400 hover:text-[var(--color-wood)]">
                         <UploadCloud size={24} className="mb-1" />
-                        <span className="text-xs font-medium">Thêm ảnh</span>
-                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleGalleryFileSelect} />
+                        <span className="text-xs font-medium">{isUploading ? "Đang tải..." : "Thêm ảnh"}</span>
+                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleGalleryFileSelect} disabled={isUploading} />
                       </label>
                     </div>
                     
@@ -547,16 +654,23 @@ export default function AdminProjectEditor() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục</label>
                 <select value={projectInfo.category} onChange={e => setProjectInfo({...projectInfo, category: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all cursor-pointer">
-                  <option>Nhà phố</option>
-                  <option>Biệt thự</option>
-                  <option>Nhà vườn</option>
-                  <option>Nội thất</option>
-                  <option>Dịch vụ khác</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phong cách</label>
-                <input type="text" value={projectInfo.style} onChange={e => setProjectInfo({...projectInfo, style: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all" placeholder="Modern, Classic..." />
+                <select value={projectInfo.style} onChange={e => setProjectInfo({...projectInfo, style: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all cursor-pointer">
+                  <option value="MODERN">Hiện đại</option>
+                  <option value="CLASSIC">Cổ điển</option>
+                  <option value="NEOCLASSIC">Tân cổ điển</option>
+                  <option value="MINIMALIST">Tối giản</option>
+                  <option value="INDUSTRIAL">Công nghiệp</option>
+                  <option value="SCANDINAVIAN">Bắc Âu</option>
+                  <option value="JAPANESE">Nhật Bản</option>
+                  <option value="TROPICAL">Nhiệt đới</option>
+                </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

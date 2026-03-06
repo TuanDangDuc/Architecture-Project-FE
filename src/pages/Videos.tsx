@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
@@ -8,7 +9,7 @@ export default function Videos() {
   const [videos, setVideos] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("https://api.kientrucmaihuong.com/api/video")
+    fetch(`${API_BASE}/api/video`)
       .then((res) => res.json())
       .then((data) => {
         // Format data to match UI requirements

@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import {
@@ -23,10 +24,10 @@ export default function Admin() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [stats, setStats] = useState({
-    views: 0,
-    clicks: 0,
-    consultations: 0,
-    projects: 0,
+    totalProjects: 0,
+    totalPosts: 0,
+    totalVideos: 0,
+    totalConsultations: 0,
   });
   const [projects, setProjects] = useState([]);
   const [consultations, setConsultations] = useState([]);
@@ -60,26 +61,26 @@ export default function Admin() {
   }, []);
 
   const fetchData = () => {
-    fetch("https://api.kientrucmaihuong.com/api/stats")
+    fetch(`${API_BASE}/api/stats`)
       .then((res) => res.json())
       .then(setStats);
-    fetch("https://api.kientrucmaihuong.com/api/project")
+    fetch(`${API_BASE}/api/project`)
       .then((res) => res.json())
       .then(setProjects);
-    fetch("https://api.kientrucmaihuong.com/api/ticket")
+    fetch(`${API_BASE}/api/ticket`)
       .then((res) => res.json())
       .then(setConsultations);
-    fetch("https://api.kientrucmaihuong.com/api/post")
+    fetch(`${API_BASE}/api/post`)
       .then((res) => res.json())
       .then(setPosts);
-    fetch("https://api.kientrucmaihuong.com/api/video")
+    fetch(`${API_BASE}/api/video`)
       .then((res) => res.json())
       .then(setVideos);
   };
 
   const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("https://api.kientrucmaihuong.com/api/project", {
+    await fetch(`${API_BASE}/api/project`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newProject),
@@ -108,10 +109,10 @@ export default function Admin() {
     try {
       const endpoint =
         deleteConfirmation.type === "project"
-          ? `https://api.kientrucmaihuong.com/api/project/${deleteConfirmation.id}`
+          ? `${API_BASE}/api/project/${deleteConfirmation.id}`
           : deleteConfirmation.type === "post"
-            ? `https://api.kientrucmaihuong.com/api/post/${deleteConfirmation.id}`
-            : `https://api.kientrucmaihuong.com/api/video/${deleteConfirmation.id}`;
+            ? `${API_BASE}/api/post/${deleteConfirmation.id}`
+            : `${API_BASE}/api/video/${deleteConfirmation.id}`;
 
       const res = await fetch(endpoint, { method: "DELETE" });
       if (res.ok) {
@@ -127,7 +128,7 @@ export default function Admin() {
   };
 
   const handleUpdateConsultationStatus = async (id: number, status: string) => {
-    await fetch(`https://api.kientrucmaihuong.com/api/ticket/${id}/status`, {
+    await fetch(`${API_BASE}/api/ticket/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -183,27 +184,27 @@ export default function Admin() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
                 <div className="w-14 h-14 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mr-4">
-                  <Eye size={28} />
+                  <FileText size={28} />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium mb-1">
-                    Lượt xem dự án
+                    Tổng bài viết
                   </p>
                   <p className="text-3xl font-bold text-gray-800">
-                    {stats.views}
+                    {stats.totalPosts}
                   </p>
                 </div>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
                 <div className="w-14 h-14 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mr-4">
-                  <MousePointerClick size={28} />
+                  <PlayCircle size={28} />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium mb-1">
-                    Lượt click
+                    Tổng Video
                   </p>
                   <p className="text-3xl font-bold text-gray-800">
-                    {stats.clicks}
+                    {stats.totalVideos}
                   </p>
                 </div>
               </div>
@@ -213,10 +214,10 @@ export default function Admin() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium mb-1">
-                    Tư vấn mới
+                    Yêu cầu tư vấn
                   </p>
                   <p className="text-3xl font-bold text-gray-800">
-                    {stats.consultations}
+                    {stats.totalConsultations}
                   </p>
                 </div>
               </div>
@@ -229,7 +230,7 @@ export default function Admin() {
                     Tổng dự án
                   </p>
                   <p className="text-3xl font-bold text-gray-800">
-                    {stats.projects}
+                    {stats.totalProjects}
                   </p>
                 </div>
               </div>
@@ -257,18 +258,10 @@ export default function Admin() {
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="p-4 font-semibold text-gray-600">Dự án</th>
-                    <th className="p-4 font-semibold text-gray-600">
-                      Danh mục
-                    </th>
-                    <th className="p-4 font-semibold text-gray-600">
-                      Diện tích
-                    </th>
-                    <th className="p-4 font-semibold text-gray-600">
-                      Lượt xem
-                    </th>
-                    <th className="p-4 font-semibold text-gray-600 text-right">
-                      Thao tác
-                    </th>
+                    <th className="p-4 font-semibold text-gray-600">Phân loại</th>
+                    <th className="p-4 font-semibold text-gray-600">Phong cách</th>
+                    <th className="p-4 font-semibold text-gray-600">Thông số</th>
+                    <th className="p-4 font-semibold text-gray-600 text-right">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -278,22 +271,37 @@ export default function Admin() {
                       className="border-b border-gray-100 hover:bg-gray-50"
                     >
                       <td className="p-4 flex items-center">
-                        <img
-                          src={
-                            p.thumbnail ||
-                            `https://loremflickr.com/100/100/architecture?lock=${p.id}`
-                          }
-                          alt=""
-                          className="w-12 h-12 rounded object-cover mr-4"
-                          referrerPolicy="no-referrer"
-                        />
-                        <span className="font-medium text-gray-800">
-                          {p.title}
+                        <div className="w-16 h-12 rounded-lg overflow-hidden bg-gray-100 mr-4 shrink-0 shadow-sm border border-gray-100">
+                          <img
+                            src={p.titleImage || `https://loremflickr.com/100/100/architecture?lock=${p.id}`}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-900 line-clamp-1">{p.name}</p>
+                          <p className="text-xs text-gray-400">ID: #{p.id}</p>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-semibold uppercase tracking-wider">
+                          {p.category?.name || "N/A"}
                         </span>
                       </td>
-                      <td className="p-4 text-gray-600">{p.category}</td>
-                      <td className="p-4 text-gray-600">{p.area} m²</td>
-                      <td className="p-4 text-gray-600">{p.views}</td>
+                      <td className="p-4">
+                        <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-semibold uppercase tracking-wider">
+                          {p.style}
+                        </span>
+                      </td>
+                      <td className="p-4 text-gray-600">
+                        <div className="flex flex-col text-sm">
+                          <span className="font-medium text-gray-800">DT: {p.area} m²</span>
+                          <span className="text-xs text-[var(--color-wood)] font-bold">
+                            {p.constructionCost ? `${p.constructionCost} tỷ VNĐ` : "Liên hệ"}
+                          </span>
+                        </div>
+                      </td>
                       <td className="p-4 text-right space-x-2">
                         <button
                           onClick={() =>
@@ -361,15 +369,17 @@ export default function Admin() {
                       className="border-b border-gray-100 hover:bg-gray-50"
                     >
                       <td className="p-4 flex items-center">
-                        <img
-                          src={
-                            p.thumbnail ||
-                            `https://loremflickr.com/100/100/news?lock=${p.id}`
-                          }
-                          alt=""
-                          className="w-12 h-12 rounded object-cover mr-4"
-                          referrerPolicy="no-referrer"
-                        />
+                        <div className="w-16 h-10 rounded-lg overflow-hidden bg-gray-100 mr-4 shrink-0 shadow-sm border border-gray-100">
+                          <img
+                            src={
+                              p.titleImage ||
+                              `https://loremflickr.com/100/100/news?lock=${p.id}`
+                            }
+                            alt=""
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
                         <span className="font-medium text-gray-800 line-clamp-1">
                           {p.title}
                         </span>
@@ -385,7 +395,7 @@ export default function Admin() {
                         </span>
                       </td>
                       <td className="p-4 text-gray-600">
-                        {new Date(p.created_at).toLocaleDateString("vi-VN")}
+                        {p.uploadAt ? new Date(p.uploadAt).toLocaleDateString("vi-VN") : "---"}
                       </td>
                       <td className="p-4 text-right space-x-2">
                         <button
@@ -461,11 +471,11 @@ export default function Admin() {
                       className="border-b border-gray-100 hover:bg-gray-50"
                     >
                       <td className="p-4 flex items-center">
-                        <div className="relative w-16 h-10 rounded overflow-hidden mr-4 shrink-0">
+                        <div className="relative w-16 h-10 rounded-lg overflow-hidden mr-4 shrink-0 shadow-sm border border-gray-100">
                           <img
                             src={
-                              v.thumbnail ||
-                              `https://img.youtube.com/vi/${v.youtube_id}/default.jpg`
+                              v.thumbnailUrl ||
+                              (v.youtubeId ? `https://img.youtube.com/vi/${v.youtubeId}/default.jpg` : `https://loremflickr.com/100/100/video?lock=${v.id}`)
                             }
                             alt=""
                             className="w-full h-full object-cover"
@@ -556,13 +566,13 @@ export default function Admin() {
                         <p className="text-sm text-gray-500">{c.email}</p>
                       </td>
                       <td className="p-4">
-                        <p className="text-gray-800">{c.type}</p>
+                        <p className="text-gray-800">{c.typeOfConsulting}</p>
                         <p className="text-sm text-gray-500">
                           {c.area}m² - {c.budget}
                         </p>
                       </td>
                       <td className="p-4 text-gray-600">
-                        {new Date(c.created_at).toLocaleDateString("vi-VN")}
+                        {c.createAt ? new Date(c.createAt).toLocaleDateString("vi-VN") : "---"}
                       </td>
                       <td className="p-4">
                         <select
@@ -571,19 +581,19 @@ export default function Admin() {
                             handleUpdateConsultationStatus(c.id, e.target.value)
                           }
                           className={`px-3 py-1.5 rounded-full text-sm font-medium border-0 focus:ring-2 focus:ring-gray-200 cursor-pointer transition-colors ${
-                            c.status === "Mới"
+                            c.status === "pending" || c.status === "Mới"
                               ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
-                              : c.status === "Đang xử lý"
+                              : c.status === "processing" || c.status === "Đang xử lý"
                                 ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                : c.status === "Đã liên hệ"
+                                : c.status === "contacted" || c.status === "Đã liên hệ"
                                   ? "bg-green-100 text-green-800 hover:bg-green-200"
                                   : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                           }`}
                         >
-                          <option value="Mới">Mới</option>
-                          <option value="Đang xử lý">Đang xử lý</option>
-                          <option value="Đã liên hệ">Đã liên hệ</option>
-                          <option value="Hoàn thành">Hoàn thành</option>
+                          <option value="pending">Mới (Pending)</option>
+                          <option value="processing">Đang xử lý</option>
+                          <option value="contacted">Đã liên hệ</option>
+                          <option value="completed">Hoàn thành</option>
                         </select>
                       </td>
                       <td className="p-4 text-right">

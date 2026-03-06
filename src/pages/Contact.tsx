@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle2 } from "lucide-react";
@@ -20,7 +21,7 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch("https://api.kientrucmaihuong.com/api/ticket", {
+      const res = await fetch(`${API_BASE}/api/ticket`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)

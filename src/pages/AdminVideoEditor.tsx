@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, UploadCloud, Image as ImageIcon, PlayCircle, X } from 'lucide-react';
@@ -21,7 +22,7 @@ export default function AdminVideoEditor() {
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    fetch('https://api.kientrucmaihuong.com/api/project')
+    fetch(`${API_BASE}/api/project`)
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error("Error fetching projects:", err));
@@ -76,13 +77,13 @@ export default function AdminVideoEditor() {
   const handleSave = async () => {
     try {
       if (videoInfo.id) {
-        await fetch(`https://api.kientrucmaihuong.com/api/video/${videoInfo.id}`, {
+        await fetch(`${API_BASE}/api/video/${videoInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(videoInfo)
         });
       } else {
-        await fetch('https://api.kientrucmaihuong.com/api/video', {
+        await fetch(`${API_BASE}/api/video`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(videoInfo)

@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -79,7 +80,7 @@ export default function Portfolio() {
   };
 
   useEffect(() => {
-    fetch("https://api.kientrucmaihuong.com/api/project")
+    fetch(`${API_BASE}/api/project`)
       .then(res => res.json())
       .then(data => {
         setProjects(data);
@@ -143,8 +144,8 @@ export default function Portfolio() {
                   <Link to={`/projects/${project.id}`} className="block">
                     <div className="relative aspect-[4/3] overflow-hidden bg-[var(--color-beige)]">
                       <img
-                        src={project.thumbnail || `https://loremflickr.com/800/600/architecture?lock=${project.id}`}
-                        alt={project.title}
+                        src={project.titleImage || `https://loremflickr.com/800/600/architecture?lock=${project.id}`}
+                        alt={project.name}
                         loading="lazy"
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         referrerPolicy="no-referrer"
@@ -162,11 +163,11 @@ export default function Portfolio() {
                       
                       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white/95 via-white/80 to-white/0 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 flex flex-col items-center text-center">
                         <span className="inline-block px-4 py-1 bg-white/50 backdrop-blur-md text-[var(--color-charcoal)] text-xs font-bold tracking-wider uppercase rounded-full mb-2 shadow-sm">
-                          {project.category}
+                          {project.category?.name || "Danh mục"}
                         </span>
-                        <h3 className="text-xl font-serif font-bold text-[var(--color-charcoal)] mb-2">{project.title}</h3>
+                        <h3 className="text-xl font-serif font-bold text-[var(--color-charcoal)] mb-2">{project.name}</h3>
                         <div className="text-[var(--color-charcoal)]/80 text-sm font-medium">
-                          Diện Tích: {project.area} m² / Chi Phí: {project.cost || "Liên hệ"}
+                          Diện Tích: {project.area} m² / Chi Phí: {project.constructionCost || "Liên hệ"}
                         </div>
                       </div>
                     </div>

@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -40,7 +41,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://api.kientrucmaihuong.com/api/project")
+    fetch(`${API_BASE}/api/project`)
       .then((res) => res.json())
       .then((data) => {
         setFeaturedProjects(data.slice(0, 6));

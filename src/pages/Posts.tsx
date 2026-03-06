@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
@@ -8,7 +9,7 @@ export default function Posts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://api.kientrucmaihuong.com/api/post")
+    fetch(`${API_BASE}/api/post`)
       .then(res => res.json())
       .then(data => {
         // Filter only published posts

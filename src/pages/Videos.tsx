@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api.ts';
+import { API_BASE } from "../config/api.ts";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
@@ -99,7 +99,9 @@ export default function Videos() {
                 </div>
                 <div className="absolute top-4 left-4">
                   <span className="inline-block px-3 py-1 bg-[var(--color-gold)] text-white text-xs font-bold tracking-wider uppercase rounded-full shadow-sm">
-                    {typeof video.category === 'object' ? video.category?.name : video.category}
+                    {typeof video.category === "object"
+                      ? video.category?.name
+                      : video.category}
                   </span>
                 </div>
               </div>

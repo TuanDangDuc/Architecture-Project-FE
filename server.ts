@@ -76,7 +76,9 @@ try {
   // Column already exists
 }
 
-const videoCount = db.prepare("SELECT COUNT(*) as count FROM videos").get() as { count: number };
+const videoCount = db.prepare("SELECT COUNT(*) as count FROM videos").get() as {
+  count: number;
+};
 if (videoCount.count === 0) {
   const insertVideo = db.prepare(`
     INSERT INTO videos (title, thumbnail, duration, views, category, youtube_id, project_id)
@@ -90,7 +92,7 @@ if (videoCount.count === 0) {
     12000,
     "Biệt thự",
     "dQw4w9WgXcQ",
-    1
+    1,
   );
   insertVideo.run(
     "Khám phá Penthouse Landmark 81 với thiết kế nội thất siêu sang",
@@ -99,7 +101,7 @@ if (videoCount.count === 0) {
     8500,
     "Nội thất",
     "dQw4w9WgXcQ",
-    3
+    3,
   );
   insertVideo.run(
     "Nhà phố Minimalist 4 tầng tại Quận 7 - Tối ưu ánh sáng tự nhiên",
@@ -108,38 +110,82 @@ if (videoCount.count === 0) {
     5200,
     "Nhà phố",
     "dQw4w9WgXcQ",
-    2
+    2,
   );
 }
 
-const consultationCount = db.prepare("SELECT COUNT(*) as count FROM consultations").get() as { count: number };
+const consultationCount = db
+  .prepare("SELECT COUNT(*) as count FROM consultations")
+  .get() as { count: number };
 if (consultationCount.count === 0) {
   const insertConsultation = db.prepare(`
     INSERT INTO consultations (name, phone, email, area, budget, type, time, description, status)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
-  
-  insertConsultation.run("Nguyễn Văn An", "0909123456", "nguyenvanan@gmail.com", 100, "1 - 2 tỷ", "Thiết kế nhà phố", "Buổi sáng (8h-12h)", "Tôi có mảnh đất 5x20m, muốn xây nhà phố 3 tầng phong cách hiện đại, có gara ô tô.", "Mới");
-  insertConsultation.run("Trần Thị Bích", "0912345678", "tranthibich@gmail.com", 250, "Trên 5 tỷ", "Thiết kế biệt thự", "Buổi chiều (13h-17h)", "Tư vấn thiết kế biệt thự vườn nghỉ dưỡng tại Bảo Lộc, ưu tiên không gian mở và vật liệu tự nhiên.", "Đang xử lý");
-  insertConsultation.run("Lê Hoàng Nam", "0987654321", "lehoangnam@outlook.com", 75, "500tr - 1 tỷ", "Thiết kế nội thất", "Buổi tối (18h-21h)", "Cần thiết kế và thi công nội thất căn hộ chung cư 2 phòng ngủ, phong cách tối giản (Minimalism).", "Đã liên hệ");
-  insertConsultation.run("Phạm Minh Tuấn", "0933445566", "tuanpham@company.com", 150, "2 - 5 tỷ", "Thi công trọn gói", "Buổi sáng (8h-12h)", "Xây dựng nhà phố kết hợp văn phòng kinh doanh, mặt tiền 6m.", "Mới");
+
+  insertConsultation.run(
+    "Nguyễn Văn An",
+    "0909123456",
+    "nguyenvanan@gmail.com",
+    100,
+    "1 - 2 tỷ",
+    "Thiết kế nhà phố",
+    "Buổi sáng (8h-12h)",
+    "Tôi có mảnh đất 5x20m, muốn xây nhà phố 3 tầng phong cách hiện đại, có gara ô tô.",
+    "Mới",
+  );
+  insertConsultation.run(
+    "Trần Thị Bích",
+    "0912345678",
+    "tranthibich@gmail.com",
+    250,
+    "Trên 5 tỷ",
+    "Thiết kế biệt thự",
+    "Buổi chiều (13h-17h)",
+    "Tư vấn thiết kế biệt thự vườn nghỉ dưỡng tại Bảo Lộc, ưu tiên không gian mở và vật liệu tự nhiên.",
+    "Đang xử lý",
+  );
+  insertConsultation.run(
+    "Lê Hoàng Nam",
+    "0987654321",
+    "lehoangnam@outlook.com",
+    75,
+    "500tr - 1 tỷ",
+    "Thiết kế nội thất",
+    "Buổi tối (18h-21h)",
+    "Cần thiết kế và thi công nội thất căn hộ chung cư 2 phòng ngủ, phong cách tối giản (Minimalism).",
+    "Đã liên hệ",
+  );
+  insertConsultation.run(
+    "Phạm Minh Tuấn",
+    "0933445566",
+    "tuanpham@company.com",
+    150,
+    "2 - 5 tỷ",
+    "Thi công trọn gói",
+    "Buổi sáng (8h-12h)",
+    "Xây dựng nhà phố kết hợp văn phòng kinh doanh, mặt tiền 6m.",
+    "Mới",
+  );
 }
 
-const projectCount = db.prepare("SELECT COUNT(*) as count FROM projects").get() as { count: number };
+const projectCount = db
+  .prepare("SELECT COUNT(*) as count FROM projects")
+  .get() as { count: number };
 if (projectCount.count === 0) {
   const insertProject = db.prepare(`
     INSERT INTO projects (title, area, cost, style, category, description, thumbnail, gallery, content)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
-  
+
   insertProject.run(
-    "Biệt thự Phố Hiện Đại - Q.7", 
-    350, 
-    "8.5 tỷ", 
-    "Hiện đại", 
-    "Biệt thự", 
-    "Thiết kế biệt thự phố với không gian mở, hồ bơi vô cực và sân vườn trên mái.", 
-    "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
+    "Biệt thự Phố Hiện Đại - Q.7",
+    350,
+    "8.5 tỷ",
+    "Hiện đại",
+    "Biệt thự",
+    "Thiết kế biệt thự phố với không gian mở, hồ bơi vô cực và sân vườn trên mái.",
+    "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "[]",
     `<style>
       .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
@@ -192,16 +238,16 @@ if (projectCount.count === 0) {
       <div class="quote-icon">✦</div>
       <p class="quote-text">"Tôi thực sự ấn tượng với sự chuyên nghiệp và tận tâm của đội ngũ Mai Hương Architects. Ngôi nhà không chỉ đẹp mà còn rất tiện nghi, đúng như những gì tôi hằng mơ ước về một tổ ấm bình yên."</p>
       <p class="quote-author">- Anh Tuấn, Chủ đầu tư</p>
-    </div>`
+    </div>`,
   );
   insertProject.run(
-    "Nhà Phố Tân Cổ Điển - Gò Vấp", 
-    280, 
-    "5.2 tỷ", 
-    "Tân cổ điển", 
-    "Nhà phố", 
-    "Sự kết hợp tinh tế giữa nét đẹp cổ điển sang trọng và tiện nghi hiện đại.", 
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
+    "Nhà Phố Tân Cổ Điển - Gò Vấp",
+    280,
+    "5.2 tỷ",
+    "Tân cổ điển",
+    "Nhà phố",
+    "Sự kết hợp tinh tế giữa nét đẹp cổ điển sang trọng và tiện nghi hiện đại.",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "[]",
     `<style>
       .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
@@ -233,16 +279,16 @@ if (projectCount.count === 0) {
       <div class="quote-icon">✦</div>
       <p class="quote-text">"Ngôi nhà mang lại cảm giác ấm cúng và sang trọng mỗi khi bước về. Cảm ơn đội ngũ KTS đã hiện thực hóa ý tưởng của gia đình tôi một cách xuất sắc."</p>
       <p class="quote-author">- Chị Lan, Chủ đầu tư</p>
-    </div>`
+    </div>`,
   );
   insertProject.run(
-    "Biệt thự Vườn Nghỉ Dưỡng - Đà Lạt", 
-    500, 
-    "12 tỷ", 
-    "Địa trung hải", 
-    "Nhà vườn", 
-    "Không gian nghỉ dưỡng tuyệt vời giữa lòng thành phố ngàn hoa.", 
-    "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
+    "Biệt thự Vườn Nghỉ Dưỡng - Đà Lạt",
+    500,
+    "12 tỷ",
+    "Địa trung hải",
+    "Nhà vườn",
+    "Không gian nghỉ dưỡng tuyệt vời giữa lòng thành phố ngàn hoa.",
+    "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "[]",
     `<style>
       .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
@@ -268,16 +314,16 @@ if (projectCount.count === 0) {
     </div>
 
     <h2 class="article-title">Nội thất Rustic mộc mạc</h2>
-    <p class="article-text">Nội thất bên trong sử dụng chủ yếu là gỗ thông, vải thô và gốm sứ, mang lại cảm giác ấm áp, gần gũi. Lò sưởi được bố trí tại trung tâm phòng khách, là nơi cả gia đình quây quần trong những đêm Đà Lạt se lạnh.</p>`
+    <p class="article-text">Nội thất bên trong sử dụng chủ yếu là gỗ thông, vải thô và gốm sứ, mang lại cảm giác ấm áp, gần gũi. Lò sưởi được bố trí tại trung tâm phòng khách, là nơi cả gia đình quây quần trong những đêm Đà Lạt se lạnh.</p>`,
   );
   insertProject.run(
-    "Nhà Ống Lệch Tầng - Bình Thạnh", 
-    180, 
-    "3.8 tỷ", 
-    "Minimalism", 
-    "Nhà phố", 
-    "Giải pháp tối ưu không gian và ánh sáng cho nhà phố diện tích nhỏ.", 
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
+    "Nhà Ống Lệch Tầng - Bình Thạnh",
+    180,
+    "3.8 tỷ",
+    "Minimalism",
+    "Nhà phố",
+    "Giải pháp tối ưu không gian và ánh sáng cho nhà phố diện tích nhỏ.",
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "[]",
     `<style>
       .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
@@ -292,16 +338,16 @@ if (projectCount.count === 0) {
       <img class="article-image" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Nhà ống lệch tầng" />
       <figcaption class="image-caption">Mặt cắt phối cảnh nhà ống lệch tầng</figcaption>
     </figure>
-    <p class="article-text">Phong cách Minimalism (Tối giản) được lựa chọn để tối ưu hóa không gian sử dụng. Màu trắng chủ đạo kết hợp với nội thất gỗ sáng màu tạo cảm giác rộng rãi hơn so với diện tích thực.</p>`
+    <p class="article-text">Phong cách Minimalism (Tối giản) được lựa chọn để tối ưu hóa không gian sử dụng. Màu trắng chủ đạo kết hợp với nội thất gỗ sáng màu tạo cảm giác rộng rãi hơn so với diện tích thực.</p>`,
   );
   insertProject.run(
-    "Biệt thự Mái Thái - Đồng Nai", 
-    400, 
-    "7.5 tỷ", 
-    "Á Đông", 
-    "Biệt thự", 
-    "Kiến trúc mái Thái truyền thống kết hợp công năng hiện đại, phù hợp khí hậu nhiệt đới.", 
-    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
+    "Biệt thự Mái Thái - Đồng Nai",
+    400,
+    "7.5 tỷ",
+    "Á Đông",
+    "Biệt thự",
+    "Kiến trúc mái Thái truyền thống kết hợp công năng hiện đại, phù hợp khí hậu nhiệt đới.",
+    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "[]",
     `<style>
       .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
@@ -316,16 +362,16 @@ if (projectCount.count === 0) {
       <img class="article-image" src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Biệt thự mái Thái" />
       <figcaption class="image-caption">Biệt thự mái Thái với sân vườn rộng rãi</figcaption>
     </figure>
-    <p class="article-text">Không gian sân vườn rộng rãi bao quanh ngôi nhà, tạo nên một hệ sinh thái xanh mát. Hồ cá Koi và chòi nghỉ là điểm nhấn thư giãn cho cả gia đình vào dịp cuối tuần.</p>`
+    <p class="article-text">Không gian sân vườn rộng rãi bao quanh ngôi nhà, tạo nên một hệ sinh thái xanh mát. Hồ cá Koi và chòi nghỉ là điểm nhấn thư giãn cho cả gia đình vào dịp cuối tuần.</p>`,
   );
   insertProject.run(
-    "Nội thất Căn hộ Duplex - Q.2", 
-    220, 
-    "4.5 tỷ", 
-    "Luxury", 
-    "Nội thất", 
-    "Thiết kế nội thất sang trọng, đẳng cấp với vật liệu cao cấp nhập khẩu.", 
-    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80", 
+    "Nội thất Căn hộ Duplex - Q.2",
+    220,
+    "4.5 tỷ",
+    "Luxury",
+    "Nội thất",
+    "Thiết kế nội thất sang trọng, đẳng cấp với vật liệu cao cấp nhập khẩu.",
+    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "[]",
     `<style>
       .article-title { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: bold; color: #7B1E1A; margin-top: 2.5rem; margin-bottom: 1rem; }
@@ -340,11 +386,13 @@ if (projectCount.count === 0) {
       <img class="article-image" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Nội thất Duplex" />
       <figcaption class="image-caption">Phòng khách thông tầng với view Panorama</figcaption>
     </figure>
-    <p class="article-text">Vật liệu kim loại mạ vàng PVD, đá Marble và da bò Ý được phối hợp hài hòa, tạo nên những điểm nhấn đắt giá cho không gian sống.</p>`
+    <p class="article-text">Vật liệu kim loại mạ vàng PVD, đá Marble và da bò Ý được phối hợp hài hòa, tạo nên những điểm nhấn đắt giá cho không gian sống.</p>`,
   );
 }
 
-const postCount = db.prepare("SELECT COUNT(*) as count FROM posts").get() as { count: number };
+const postCount = db.prepare("SELECT COUNT(*) as count FROM posts").get() as {
+  count: number;
+};
 if (postCount.count === 0) {
   const insertPost = db.prepare(`
     INSERT INTO posts (title, slug, excerpt, content, thumbnail, category, status)
@@ -393,7 +441,7 @@ if (postCount.count === 0) {
     <p class="article-text">Việc cập nhật xu hướng không có nghĩa là chạy theo mốt nhất thời. Tại <strong>Mai Hương Architects</strong>, chúng tôi luôn chắt lọc những tinh hoa phù hợp nhất với khí hậu, văn hóa và cá tính của từng gia chủ để kiến tạo nên những không gian sống trường tồn.</p>`,
     "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "Xu hướng",
-    "published"
+    "published",
   );
 
   insertPost.run(
@@ -429,7 +477,7 @@ if (postCount.count === 0) {
     <p class="article-text">Nhiều người nghĩ tự gọi thợ sẽ rẻ hơn, nhưng thực tế thường ngược lại do quản lý kém, thất thoát vật tư và sai sót kỹ thuật phải đập đi xây lại. Một đơn vị chuyên nghiệp sẽ giúp bạn tối ưu giải pháp, quản lý vật tư và cam kết không phát sinh chi phí.</p>`,
     "https://images.unsplash.com/photo-1591825729269-caeb344f6df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "Kinh nghiệm",
-    "published"
+    "published",
   );
 
   insertPost.run(
@@ -463,7 +511,7 @@ if (postCount.count === 0) {
     <p class="article-text">Ngày nay, Indochine được các kiến trúc sư "trẻ hóa" để phù hợp với nhịp sống hiện đại. Vẫn giữ cái hồn cốt xưa cũ nhưng đường nét được giản lược, nội thất tiện nghi hơn, tạo nên một không gian sống vừa sang trọng, vừa ấm cúng và đầy chất nghệ thuật.</p>`,
     "https://images.unsplash.com/photo-1551516594-56cb78394645?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "Kiến thức",
-    "published"
+    "published",
   );
   insertPost.run(
     "Giải pháp lấy sáng và thông gió cho nhà ống diện tích nhỏ",
@@ -472,7 +520,7 @@ if (postCount.count === 0) {
     "<p>Nhà ống thường gặp vấn đề về ánh sáng và thông gió...</p>",
     "https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "Giải pháp",
-    "published"
+    "published",
   );
   insertPost.run(
     "Phong thủy trong xây dựng nhà ở: Những điều kiêng kỵ",
@@ -481,7 +529,7 @@ if (postCount.count === 0) {
     "<p>Phong thủy đóng vai trò quan trọng trong văn hóa xây dựng của người Việt...</p>",
     "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
     "Phong thủy",
-    "published"
+    "published",
   );
 }
 
@@ -493,11 +541,21 @@ async function startServer() {
 
   // API Routes
   app.get("/api/stats", (req, res) => {
-    const views = db.prepare("SELECT SUM(views) as total FROM projects").get() as { total: number };
-    const clicks = db.prepare("SELECT SUM(clicks) as total FROM projects").get() as { total: number };
-    const consultations = db.prepare("SELECT COUNT(*) as total FROM consultations WHERE status = 'Mới'").get() as { total: number };
-    const projects = db.prepare("SELECT COUNT(*) as total FROM projects").get() as { total: number };
-    
+    const views = db
+      .prepare("SELECT SUM(views) as total FROM projects")
+      .get() as { total: number };
+    const clicks = db
+      .prepare("SELECT SUM(clicks) as total FROM projects")
+      .get() as { total: number };
+    const consultations = db
+      .prepare(
+        "SELECT COUNT(*) as total FROM consultations WHERE status = 'Mới'",
+      )
+      .get() as { total: number };
+    const projects = db
+      .prepare("SELECT COUNT(*) as total FROM projects")
+      .get() as { total: number };
+
     res.json({
       views: views.total || 0,
       clicks: clicks.total || 0,
@@ -507,37 +565,93 @@ async function startServer() {
   });
 
   app.get("/api/projects", (req, res) => {
-    const projects = db.prepare("SELECT * FROM projects ORDER BY created_at DESC").all();
-    res.json(projects.map((p: any) => ({ ...p, gallery: JSON.parse(p.gallery || '[]') })));
+    const projects = db
+      .prepare("SELECT * FROM projects ORDER BY created_at DESC")
+      .all();
+    res.json(
+      projects.map((p: any) => ({
+        ...p,
+        gallery: JSON.parse(p.gallery || "[]"),
+      })),
+    );
   });
 
   app.get("/api/projects/:id", (req, res) => {
-    const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(req.params.id) as any;
+    const project = db
+      .prepare("SELECT * FROM projects WHERE id = ?")
+      .get(req.params.id) as any;
     if (project) {
-      db.prepare("UPDATE projects SET views = views + 1 WHERE id = ?").run(req.params.id);
-      res.json({ ...project, gallery: JSON.parse(project.gallery || '[]') });
+      db.prepare("UPDATE projects SET views = views + 1 WHERE id = ?").run(
+        req.params.id,
+      );
+      res.json({ ...project, gallery: JSON.parse(project.gallery || "[]") });
     } else {
       res.status(404).json({ error: "Not found" });
     }
   });
 
   app.post("/api/projects", (req, res) => {
-    const { title, area, cost, style, category, description, content, thumbnail, gallery, video } = req.body;
+    const {
+      title,
+      area,
+      cost,
+      style,
+      category,
+      description,
+      content,
+      thumbnail,
+      gallery,
+      video,
+    } = req.body;
     const stmt = db.prepare(`
       INSERT INTO projects (title, area, cost, style, category, description, content, thumbnail, gallery, video)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    const info = stmt.run(title, area, cost, style, category, description, content, thumbnail, JSON.stringify(gallery || []), video);
+    const info = stmt.run(
+      title,
+      area,
+      cost,
+      style,
+      category,
+      description,
+      content,
+      thumbnail,
+      JSON.stringify(gallery || []),
+      video,
+    );
     res.json({ id: info.lastInsertRowid });
   });
 
   app.put("/api/projects/:id", (req, res) => {
-    const { title, area, cost, style, category, description, content, thumbnail, gallery, video } = req.body;
+    const {
+      title,
+      area,
+      cost,
+      style,
+      category,
+      description,
+      content,
+      thumbnail,
+      gallery,
+      video,
+    } = req.body;
     const stmt = db.prepare(`
       UPDATE projects SET title = ?, area = ?, cost = ?, style = ?, category = ?, description = ?, content = ?, thumbnail = ?, gallery = ?, video = ?
       WHERE id = ?
     `);
-    stmt.run(title, area, cost, style, category, description, content, thumbnail, JSON.stringify(gallery || []), video, req.params.id);
+    stmt.run(
+      title,
+      area,
+      cost,
+      style,
+      category,
+      description,
+      content,
+      thumbnail,
+      JSON.stringify(gallery || []),
+      video,
+      req.params.id,
+    );
     res.json({ success: true });
   });
 
@@ -547,61 +661,105 @@ async function startServer() {
   });
 
   app.post("/api/projects/:id/click", (req, res) => {
-    db.prepare("UPDATE projects SET clicks = clicks + 1 WHERE id = ?").run(req.params.id);
+    db.prepare("UPDATE projects SET clicks = clicks + 1 WHERE id = ?").run(
+      req.params.id,
+    );
     res.json({ success: true });
   });
 
   app.get("/api/consultations", (req, res) => {
-    const consultations = db.prepare("SELECT * FROM consultations ORDER BY created_at DESC").all();
+    const consultations = db
+      .prepare("SELECT * FROM consultations ORDER BY created_at DESC")
+      .all();
     res.json(consultations);
   });
 
   app.post("/api/consultations", (req, res) => {
-    const { name, phone, email, area, budget, type, time, description } = req.body;
+    const { name, phone, email, area, budget, type, time, description } =
+      req.body;
     const stmt = db.prepare(`
       INSERT INTO consultations (name, phone, email, area, budget, type, time, description)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    const info = stmt.run(name, phone, email, area, budget, type, time, description);
+    const info = stmt.run(
+      name,
+      phone,
+      email,
+      area,
+      budget,
+      type,
+      time,
+      description,
+    );
     res.json({ id: info.lastInsertRowid });
   });
 
   app.put("/api/consultations/:id/status", (req, res) => {
-    db.prepare("UPDATE consultations SET status = ? WHERE id = ?").run(req.body.status, req.params.id);
+    db.prepare("UPDATE consultations SET status = ? WHERE id = ?").run(
+      req.body.status,
+      req.params.id,
+    );
     res.json({ success: true });
   });
 
   // --- Posts API ---
   app.get("/api/posts", (req, res) => {
-    const posts = db.prepare("SELECT * FROM posts ORDER BY created_at DESC").all();
+    const posts = db
+      .prepare("SELECT * FROM posts ORDER BY created_at DESC")
+      .all();
     res.json(posts);
   });
 
   app.get("/api/posts/:id", (req, res) => {
-    const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
+    const post = db
+      .prepare("SELECT * FROM posts WHERE id = ?")
+      .get(req.params.id);
     if (post) res.json(post);
     else res.status(404).json({ error: "Not found" });
   });
 
   app.post("/api/posts", (req, res) => {
     const { title, excerpt, content, thumbnail, category, status } = req.body;
-    const slug = title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    const slug = title
+      .toLowerCase()
+      .replace(/ /g, "-")
+      .replace(/[^\w-]+/g, "");
     const stmt = db.prepare(`
       INSERT INTO posts (title, slug, excerpt, content, thumbnail, category, status)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    const info = stmt.run(title, slug, excerpt, content, thumbnail, category, status || 'published');
+    const info = stmt.run(
+      title,
+      slug,
+      excerpt,
+      content,
+      thumbnail,
+      category,
+      status || "published",
+    );
     res.json({ id: info.lastInsertRowid });
   });
 
   app.put("/api/posts/:id", (req, res) => {
     const { title, excerpt, content, thumbnail, category, status } = req.body;
-    const slug = title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    const slug = title
+      .toLowerCase()
+      .replace(/ /g, "-")
+      .replace(/[^\w-]+/g, "");
     const stmt = db.prepare(`
       UPDATE posts SET title = ?, slug = ?, excerpt = ?, content = ?, thumbnail = ?, category = ?, status = ?
       WHERE id = ?
     `);
-    stmt.run(title, slug, excerpt, content, thumbnail, category, status || 'published', req.params.id);
+    stmt.run(
+      title,
+      slug,
+      excerpt,
+      content,
+      thumbnail,
+      category,
+      status || "published",
+      req.params.id,
+    );
     res.json({ success: true });
   });
 
@@ -613,33 +771,54 @@ async function startServer() {
 
   // --- Videos API ---
   app.get("/api/videos", (req, res) => {
-    const videos = db.prepare("SELECT * FROM videos ORDER BY created_at DESC").all();
+    const videos = db
+      .prepare("SELECT * FROM videos ORDER BY created_at DESC")
+      .all();
     res.json(videos);
   });
 
   app.get("/api/videos/:id", (req, res) => {
-    const video = db.prepare("SELECT * FROM videos WHERE id = ?").get(req.params.id);
+    const video = db
+      .prepare("SELECT * FROM videos WHERE id = ?")
+      .get(req.params.id);
     if (video) res.json(video);
     else res.status(404).json({ error: "Not found" });
   });
 
   app.post("/api/videos", (req, res) => {
-    const { title, thumbnail, duration, category, youtube_id, project_id } = req.body;
+    const { title, thumbnail, duration, category, youtube_id, project_id } =
+      req.body;
     const stmt = db.prepare(`
       INSERT INTO videos (title, thumbnail, duration, category, youtube_id, project_id)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
-    const info = stmt.run(title, thumbnail, duration, category, youtube_id, project_id);
+    const info = stmt.run(
+      title,
+      thumbnail,
+      duration,
+      category,
+      youtube_id,
+      project_id,
+    );
     res.json({ id: info.lastInsertRowid });
   });
 
   app.put("/api/videos/:id", (req, res) => {
-    const { title, thumbnail, duration, category, youtube_id, project_id } = req.body;
+    const { title, thumbnail, duration, category, youtube_id, project_id } =
+      req.body;
     const stmt = db.prepare(`
       UPDATE videos SET title = ?, thumbnail = ?, duration = ?, category = ?, youtube_id = ?, project_id = ?
       WHERE id = ?
     `);
-    stmt.run(title, thumbnail, duration, category, youtube_id, project_id, req.params.id);
+    stmt.run(
+      title,
+      thumbnail,
+      duration,
+      category,
+      youtube_id,
+      project_id,
+      req.params.id,
+    );
     res.json({ success: true });
   });
 
@@ -660,7 +839,10 @@ async function startServer() {
     app.get(/^(?!\/api).*$/, async (req, res) => {
       try {
         const indexPath = path.join(__dirname, "index.html");
-        const indexHtml = await vite.transformIndexHtml(req.url, fs.readFileSync(indexPath, "utf-8"));
+        const indexHtml = await vite.transformIndexHtml(
+          req.url,
+          fs.readFileSync(indexPath, "utf-8"),
+        );
         res.set("Content-Type", "text/html");
         res.end(indexHtml);
       } catch (e) {

@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api';
+import { API_BASE } from '../config/api.ts';
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";

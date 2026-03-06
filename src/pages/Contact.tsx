@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api';
+import { API_BASE } from '../config/api.ts';
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle2 } from "lucide-react";
@@ -73,7 +73,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-charcoal)]/50 mb-1">Địa chỉ văn phòng</h4>
-                    <p className="text-[var(--color-charcoal)] font-medium text-lg">48 Võ trường Toản , Phường Lâm Viên, Tp. Đà lạt, Đà Lạt, Vietnam</p>
+                    <p className="text-[var(--color-charcoal)] font-medium text-lg">46 Võ Trường Toản, Phường Lâm Viên, Tp. Đà lạt, Đà Lạt, Vietnam</p>
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -108,7 +108,7 @@ export default function Contact() {
 
             <div className="rounded-3xl overflow-hidden h-[300px] shadow-sm border border-[var(--color-beige)]">
               <iframe 
-                src="https://maps.google.com/maps?q=48+Võ+Trường+Toản,+Đà+Lạt&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                src="https://maps.google.com/maps?q=46+Võ+Trường+Toản,+Đà+Lạt&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 

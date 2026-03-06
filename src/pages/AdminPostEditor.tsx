@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api';
+import { API_BASE } from '../config/api.ts';
 import React, { useEffect, useRef, useState } from 'react';
 import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';

@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api';
+import { API_BASE } from '../config/api.ts';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, UploadCloud, Image as ImageIcon, PlayCircle, X } from 'lucide-react';

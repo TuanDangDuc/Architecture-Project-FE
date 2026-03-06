@@ -3,7 +3,7 @@ import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Save, Plus, Trash2, Link, Image as ImageIcon, Video, FileText, ArrowLeft, UploadCloud, X, Settings, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
-import { API_BASE } from '../config/api';
+import { API_BASE } from '../config/api.ts';
 
 export default function AdminProjectEditor() {
   const location = useLocation();

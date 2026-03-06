@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api'; // re-trigger HMR
+import { API_BASE } from '../config/api.ts'; // re-trigger HMR
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";

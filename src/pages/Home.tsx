@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api';
+import { API_BASE } from '../config/api.ts';
 import { motion } from "motion/react";
 import {
   ArrowRight,

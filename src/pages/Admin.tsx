@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api.ts';
+import { API_BASE } from "../config/api.ts";
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import {
@@ -258,10 +258,18 @@ export default function Admin() {
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="p-4 font-semibold text-gray-600">Dự án</th>
-                    <th className="p-4 font-semibold text-gray-600">Phân loại</th>
-                    <th className="p-4 font-semibold text-gray-600">Phong cách</th>
-                    <th className="p-4 font-semibold text-gray-600">Thông số</th>
-                    <th className="p-4 font-semibold text-gray-600 text-right">Thao tác</th>
+                    <th className="p-4 font-semibold text-gray-600">
+                      Phân loại
+                    </th>
+                    <th className="p-4 font-semibold text-gray-600">
+                      Phong cách
+                    </th>
+                    <th className="p-4 font-semibold text-gray-600">
+                      Thông số
+                    </th>
+                    <th className="p-4 font-semibold text-gray-600 text-right">
+                      Thao tác
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -273,14 +281,19 @@ export default function Admin() {
                       <td className="p-4 flex items-center">
                         <div className="w-16 h-12 rounded-lg overflow-hidden bg-gray-100 mr-4 shrink-0 shadow-sm border border-gray-100">
                           <img
-                            src={p.titleImage || `https://loremflickr.com/100/100/architecture?lock=${p.id}`}
+                            src={
+                              p.titleImage ||
+                              `https://loremflickr.com/100/100/architecture?lock=${p.id}`
+                            }
                             alt=""
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"
                           />
                         </div>
                         <div>
-                          <p className="font-bold text-gray-900 line-clamp-1">{p.name}</p>
+                          <p className="font-bold text-gray-900 line-clamp-1">
+                            {p.name}
+                          </p>
                           <p className="text-xs text-gray-400">ID: #{p.id}</p>
                         </div>
                       </td>
@@ -296,9 +309,13 @@ export default function Admin() {
                       </td>
                       <td className="p-4 text-gray-600">
                         <div className="flex flex-col text-sm">
-                          <span className="font-medium text-gray-800">DT: {p.area} m²</span>
+                          <span className="font-medium text-gray-800">
+                            DT: {p.area} m²
+                          </span>
                           <span className="text-xs text-[var(--color-wood)] font-bold">
-                            {p.constructionCost ? `${p.constructionCost} tỷ VNĐ` : "Liên hệ"}
+                            {p.constructionCost
+                              ? `${p.constructionCost} tỷ VNĐ`
+                              : "Liên hệ"}
                           </span>
                         </div>
                       </td>
@@ -395,7 +412,9 @@ export default function Admin() {
                         </span>
                       </td>
                       <td className="p-4 text-gray-600">
-                        {p.uploadAt ? new Date(p.uploadAt).toLocaleDateString("vi-VN") : "---"}
+                        {p.uploadAt
+                          ? new Date(p.uploadAt).toLocaleDateString("vi-VN")
+                          : "---"}
                       </td>
                       <td className="p-4 text-right space-x-2">
                         <button
@@ -475,7 +494,9 @@ export default function Admin() {
                           <img
                             src={
                               v.thumbnailUrl ||
-                              (v.youtubeId ? `https://img.youtube.com/vi/${v.youtubeId}/default.jpg` : `https://loremflickr.com/100/100/video?lock=${v.id}`)
+                              (v.youtubeId
+                                ? `https://img.youtube.com/vi/${v.youtubeId}/default.jpg`
+                                : `https://loremflickr.com/100/100/video?lock=${v.id}`)
                             }
                             alt=""
                             className="w-full h-full object-cover"
@@ -489,7 +510,11 @@ export default function Admin() {
                           {v.title}
                         </span>
                       </td>
-                      <td className="p-4 text-gray-600">{v.category}</td>
+                      <td className="p-4 text-gray-600">
+                        {typeof v.category === "object"
+                          ? v.category?.name
+                          : v.category}
+                      </td>
                       <td className="p-4 text-gray-600">{v.duration}</td>
                       <td className="p-4 text-gray-600">{v.views}</td>
                       <td className="p-4 text-right space-x-2">
@@ -572,7 +597,9 @@ export default function Admin() {
                         </p>
                       </td>
                       <td className="p-4 text-gray-600">
-                        {c.createAt ? new Date(c.createAt).toLocaleDateString("vi-VN") : "---"}
+                        {c.createAt
+                          ? new Date(c.createAt).toLocaleDateString("vi-VN")
+                          : "---"}
                       </td>
                       <td className="p-4">
                         <select
@@ -583,9 +610,11 @@ export default function Admin() {
                           className={`px-3 py-1.5 rounded-full text-sm font-medium border-0 focus:ring-2 focus:ring-gray-200 cursor-pointer transition-colors ${
                             c.status === "pending" || c.status === "Mới"
                               ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
-                              : c.status === "processing" || c.status === "Đang xử lý"
+                              : c.status === "processing" ||
+                                  c.status === "Đang xử lý"
                                 ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                : c.status === "contacted" || c.status === "Đã liên hệ"
+                                : c.status === "contacted" ||
+                                    c.status === "Đã liên hệ"
                                   ? "bg-green-100 text-green-800 hover:bg-green-200"
                                   : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                           }`}

@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api.ts';
+import { API_BASE } from "../config/api.ts";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -220,7 +220,9 @@ export default function Home() {
 
                     <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white/95 via-white/80 to-white/0 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 flex flex-col items-center text-center">
                       <span className="inline-block px-4 py-1 bg-white/50 backdrop-blur-md text-[var(--color-charcoal)] text-xs font-bold tracking-wider uppercase rounded-full mb-2 shadow-sm">
-                        {project.category}
+                        {typeof project.category === "object"
+                          ? project.category?.name
+                          : project.category}
                       </span>
                       <h3 className="text-xl md:text-2xl font-serif font-bold text-[var(--color-charcoal)] mb-2">
                         {project.title}

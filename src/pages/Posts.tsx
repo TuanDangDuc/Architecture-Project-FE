@@ -1,4 +1,4 @@
-import { API_BASE } from '../config/api.ts';
+import { API_BASE } from "../config/api.ts";
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
@@ -10,14 +10,16 @@ export default function Posts() {
 
   useEffect(() => {
     fetch(`${API_BASE}/api/post`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         // Filter only published posts
-        const publishedPosts = data.filter((p: any) => p.status === 'published');
+        const publishedPosts = data.filter(
+          (p: any) => p.status === "published",
+        );
         setPosts(publishedPosts);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error fetching posts:", err);
         setLoading(false);
       });
@@ -35,9 +37,12 @@ export default function Posts() {
     <div className="bg-[var(--color-cream)] min-h-screen py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-[var(--color-wood)] mb-6">Tin tức & Bài viết</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-[var(--color-wood)] mb-6">
+            Tin tức & Bài viết
+          </h1>
           <p className="text-lg text-[var(--color-charcoal)]/70 max-w-2xl mx-auto font-light">
-            Cập nhật những xu hướng thiết kế mới nhất, kinh nghiệm xây nhà và các kiến thức hữu ích về kiến trúc, nội thất.
+            Cập nhật những xu hướng thiết kế mới nhất, kinh nghiệm xây nhà và
+            các kiến thức hữu ích về kiến trúc, nội thất.
           </p>
         </div>
 
@@ -51,9 +56,15 @@ export default function Posts() {
               transition={{ duration: 0.5, delay: Math.min(index * 0.1, 0.3) }}
               className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-[var(--color-beige)] group flex flex-col"
             >
-              <Link to={`/posts/${post.id}`} className="block relative aspect-[4/3] overflow-hidden">
+              <Link
+                to={`/posts/${post.id}`}
+                className="block relative aspect-[4/3] overflow-hidden"
+              >
                 <img
-                  src={post.thumbnail || `https://loremflickr.com/800/600/architecture?lock=${post.id}`}
+                  src={
+                    post.thumbnail ||
+                    `https://loremflickr.com/800/600/architecture?lock=${post.id}`
+                  }
                   alt={post.title}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -61,14 +72,21 @@ export default function Posts() {
                 />
                 <div className="absolute top-4 left-4">
                   <span className="inline-block px-3 py-1 bg-[var(--color-wood)] text-white text-xs font-bold tracking-wider uppercase rounded-full shadow-sm">
-                    {post.category}
+                    {typeof post.category === "object"
+                      ? post.category?.name
+                      : post.category}
                   </span>
                 </div>
               </Link>
               <div className="p-6 flex flex-col flex-grow">
                 <div className="flex items-center text-xs text-[var(--color-charcoal)]/60 mb-4 space-x-4">
-                  <span className="flex items-center"><Calendar size={14} className="mr-1" /> {new Date(post.created_at).toLocaleDateString('vi-VN')}</span>
-                  <span className="flex items-center"><User size={14} className="mr-1" /> Admin</span>
+                  <span className="flex items-center">
+                    <Calendar size={14} className="mr-1" />{" "}
+                    {new Date(post.created_at).toLocaleDateString("vi-VN")}
+                  </span>
+                  <span className="flex items-center">
+                    <User size={14} className="mr-1" /> Admin
+                  </span>
                 </div>
                 <Link to={`/posts/${post.id}`} className="block mb-3">
                   <h2 className="text-xl font-serif font-bold text-[var(--color-charcoal)] group-hover:text-[var(--color-gold)] transition-colors line-clamp-2">
@@ -78,7 +96,10 @@ export default function Posts() {
                 <p className="text-[var(--color-charcoal)]/70 text-sm leading-relaxed mb-6 line-clamp-3 flex-grow">
                   {post.excerpt}
                 </p>
-                <Link to={`/posts/${post.id}`} className="inline-flex items-center text-[var(--color-wood)] font-medium hover:text-[var(--color-gold)] transition-colors mt-auto">
+                <Link
+                  to={`/posts/${post.id}`}
+                  className="inline-flex items-center text-[var(--color-wood)] font-medium hover:text-[var(--color-gold)] transition-colors mt-auto"
+                >
                   Đọc tiếp <ArrowRight size={16} className="ml-1" />
                 </Link>
               </div>

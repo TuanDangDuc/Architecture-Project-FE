@@ -3,6 +3,7 @@ import { createServer as createViteServer } from "vite";
 import Database from "better-sqlite3";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -655,6 +656,17 @@ async function startServer() {
       appType: "spa",
     });
     app.use(vite.middlewares);
+    // SPA fallback: serve index.html for all non-API routes
+    app.get(/^(?!\/api).*$/, async (req, res) => {
+      try {
+        const indexPath = path.join(__dirname, "index.html");
+        const indexHtml = await vite.transformIndexHtml(req.url, fs.readFileSync(indexPath, "utf-8"));
+        res.set("Content-Type", "text/html");
+        res.end(indexHtml);
+      } catch (e) {
+        res.status(500).end((e as Error).message);
+      }
+    });
   } else {
     app.use(express.static(path.join(__dirname, "dist")));
     app.get("*", (req, res) => {

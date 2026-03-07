@@ -27,6 +27,8 @@ export default function ProjectDetail() {
     url: string;
     type: string;
   } | null>(null);
+  const [projectImages, setProjectImages] = useState<any[]>([]);
+  const [direction, setDirection] = useState(0); // 1 = forward, -1 = backward
 
   useEffect(() => {
     fetch(`${API_BASE}/api/project/${id}`)
@@ -35,6 +37,13 @@ export default function ProjectDetail() {
         setProject(data);
         setLoading(false);
       });
+    // Fetch project images from Backblaze
+    fetch(`${API_BASE}/api/image/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setProjectImages(data);
+      })
+      .catch(() => {});
   }, [id]);
 
   const getVideoInfo = (url: string) => {
@@ -88,24 +97,38 @@ export default function ProjectDetail() {
     );
   }
 
-  const galleryImages =
-    project.gallery && project.gallery.length > 0
+  // Build gallery from fetched images, falling back to project data
+  const galleryImages = projectImages.length > 0
+    ? [
+        project.titleImage || project.thumbnail,
+        ...projectImages.map((img: any) => img.url),
+      ].filter(Boolean)
+    : project.gallery && project.gallery.length > 0
       ? [project.thumbnail, ...project.gallery]
       : [
           project.titleImage ||
             `https://loremflickr.com/1920/1080/architecture?lock=${project.id}`,
-          `https://loremflickr.com/1920/1080/interior?lock=${project.id}1`,
-          `https://loremflickr.com/1920/1080/interior?lock=${project.id}2`,
-          `https://loremflickr.com/1920/1080/interior?lock=${project.id}3`,
-          `https://loremflickr.com/1920/1080/interior?lock=${project.id}4`,
         ];
 
-  const nextImage = () =>
+  // Sliding window: always show 5 thumbnails
+  const THUMB_COUNT = 5;
+  const thumbStart = Math.min(
+    Math.max(0, activeImage),
+    Math.max(0, galleryImages.length - THUMB_COUNT)
+  );
+  const windowThumbs = galleryImages.slice(thumbStart, thumbStart + THUMB_COUNT);
+  const remaining = galleryImages.length - (thumbStart + THUMB_COUNT);
+
+  const nextImage = () => {
+    setDirection(1);
     setActiveImage((prev) => (prev + 1) % galleryImages.length);
-  const prevImage = () =>
+  };
+  const prevImage = () => {
+    setDirection(-1);
     setActiveImage(
       (prev) => (prev - 1 + galleryImages.length) % galleryImages.length,
     );
+  };
 
   return (
     <div className="bg-[var(--color-cream)] min-h-screen pb-24 pt-8">
@@ -149,9 +172,9 @@ export default function ProjectDetail() {
         </div>
 
         {/* Gallery Section */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-16">
+        <div className="flex flex-col lg:flex-row gap-3 mb-16">
           {/* Main Image */}
-          <div className="lg:w-3/4 relative aspect-video rounded-2xl overflow-hidden bg-[var(--color-beige)] shadow-md group">
+          <div className="lg:flex-1 relative aspect-video rounded-2xl overflow-hidden bg-[var(--color-beige)] shadow-md group">
             <img
               src={galleryImages[activeImage]}
               alt={project.name}
@@ -177,22 +200,46 @@ export default function ProjectDetail() {
             </button>
           </div>
 
-          {/* Thumbnails */}
-          <div className="lg:w-1/4 flex flex-row lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto lg:max-h-[calc(75vw*9/16)] xl:max-h-[600px] pb-2 lg:pb-0 scrollbar-hide">
-            {galleryImages.map((img: string, idx: number) => (
-              <div
-                key={idx}
-                onClick={() => setActiveImage(idx)}
-                className={`cursor-pointer rounded-xl overflow-hidden border-2 shrink-0 lg:shrink w-32 lg:w-full aspect-video transition-all ${activeImage === idx ? "border-[var(--color-gold)] opacity-100" : "border-transparent opacity-60 hover:opacity-100"}`}
-              >
-                <img
-                  src={img}
-                  alt={`Thumbnail ${idx}`}
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-            ))}
+          {/* Thumbnails — sliding window of 5 */}
+          <div className="lg:w-[90px] xl:w-[100px] flex flex-row lg:flex-col gap-1 overflow-hidden pb-2 lg:pb-0">
+            <AnimatePresence initial={false} mode="popLayout">
+              {windowThumbs.map((img: string, i: number) => {
+                const realIdx = thumbStart + i;
+                const isLast = i === THUMB_COUNT - 1 && remaining > 0;
+                return (
+                  <motion.div
+                    key={`thumb-${realIdx}`}
+                    layout
+                    initial={{ opacity: 0, y: direction >= 0 ? 50 : -50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: direction >= 0 ? -50 : 50 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    onClick={() => {
+                      setDirection(realIdx > activeImage ? 1 : -1);
+                      setActiveImage(realIdx);
+                    }}
+                    className={`relative cursor-pointer rounded overflow-hidden border shrink-0 lg:shrink w-16 lg:w-full aspect-square transition-all ${
+                      activeImage === realIdx
+                        ? "border-[var(--color-gold)] opacity-100 shadow-sm"
+                        : "border-transparent opacity-50 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${realIdx + 1}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    {isLast && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span className="text-white text-lg font-bold">+{remaining}</span>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         </div>
 

@@ -90,7 +90,7 @@ export default function ProjectDetail() {
 
   const galleryImages =
     project.gallery && project.gallery.length > 0
-      ? [project.thumbnail, ...project.gallery]
+      ? [project.titleImage, ...project.gallery]
       : [
           project.titleImage ||
             `https://loremflickr.com/1920/1080/architecture?lock=${project.id}`,
@@ -430,7 +430,9 @@ export default function ProjectDetail() {
                     Hạng mục
                   </span>
                   <span className="font-medium text-[var(--color-charcoal)]">
-                    {project.category}
+                    {typeof project.category === "object"
+                      ? project.category?.name
+                      : project.category}
                   </span>
                 </li>
                 <li className="flex justify-between items-center py-2 border-b border-gray-50">
@@ -463,7 +465,7 @@ export default function ProjectDetail() {
                     Chi phí
                   </span>
                   <span className="font-medium text-[var(--color-charcoal)]">
-                    {project.cost || "Liên hệ"}
+                    {project.constructionCost || "Liên hệ"}
                   </span>
                 </li>
               </ul>

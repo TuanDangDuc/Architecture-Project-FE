@@ -299,7 +299,7 @@ export default function Admin() {
                       </td>
                       <td className="p-4">
                         <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-semibold uppercase tracking-wider">
-                          {p.category?.name || "N/A"}
+                          {typeof p.category === 'object' ? p.category?.name : (p.category || "N/A")}
                         </span>
                       </td>
                       <td className="p-4">
@@ -402,18 +402,18 @@ export default function Admin() {
                         </span>
                       </td>
                       <td className="p-4 text-gray-600">
-                        {p.category || "Tin tức"}
+                        {typeof p.category === 'object' ? p.category?.name : (p.category || "Tin tức")}
                       </td>
                       <td className="p-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${p.status === "published" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${p.status === "ACTIVE" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
                         >
-                          {p.status === "published" ? "Đã đăng" : "Bản nháp"}
+                          {p.status === "ACTIVE" ? "Đã đăng" : "Bản nháp"}
                         </span>
                       </td>
                       <td className="p-4 text-gray-600">
-                        {p.uploadAt
-                          ? new Date(p.uploadAt).toLocaleDateString("vi-VN")
+                        {p.createdAt
+                          ? new Date(p.createdAt).toLocaleDateString("vi-VN")
                           : "---"}
                       </td>
                       <td className="p-4 text-right space-x-2">
@@ -742,7 +742,7 @@ export default function Admin() {
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Ngày gửi</p>
                     <p className="font-medium text-gray-800">
-                      {new Date(selectedConsultation.created_at).toLocaleString(
+                      {new Date(selectedConsultation.createAt).toLocaleString(
                         "vi-VN",
                       )}
                     </p>
@@ -769,7 +769,7 @@ export default function Admin() {
                       Loại công trình
                     </p>
                     <p className="font-medium text-gray-800">
-                      {selectedConsultation.type}
+                      {selectedConsultation.typeOfConsulting}
                     </p>
                   </div>
                   <div>
@@ -777,7 +777,7 @@ export default function Admin() {
                       Thời gian dự kiến
                     </p>
                     <p className="font-medium text-gray-800">
-                      {selectedConsultation.time}
+                      {selectedConsultation.timeReceipt || "---"}
                     </p>
                   </div>
                   <div>

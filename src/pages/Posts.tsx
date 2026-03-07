@@ -14,7 +14,7 @@ export default function Posts() {
       .then((data) => {
         // Filter only published posts
         const publishedPosts = data.filter(
-          (p: any) => p.status === "published",
+          (p: any) => p.status === "ACTIVE",
         );
         setPosts(publishedPosts);
         setLoading(false);
@@ -62,7 +62,7 @@ export default function Posts() {
               >
                 <img
                   src={
-                    post.thumbnail ||
+                    post.titleImage ||
                     `https://loremflickr.com/800/600/architecture?lock=${post.id}`
                   }
                   alt={post.title}
@@ -82,7 +82,7 @@ export default function Posts() {
                 <div className="flex items-center text-xs text-[var(--color-charcoal)]/60 mb-4 space-x-4">
                   <span className="flex items-center">
                     <Calendar size={14} className="mr-1" />{" "}
-                    {new Date(post.created_at).toLocaleDateString("vi-VN")}
+                    {new Date(post.createdAt || post.uploadAt).toLocaleDateString("vi-VN")}
                   </span>
                   <span className="flex items-center">
                     <User size={14} className="mr-1" /> Admin
@@ -94,7 +94,7 @@ export default function Posts() {
                   </h2>
                 </Link>
                 <p className="text-[var(--color-charcoal)]/70 text-sm leading-relaxed mb-6 line-clamp-3 flex-grow">
-                  {post.excerpt}
+                  {post.description}
                 </p>
                 <Link
                   to={`/posts/${post.id}`}

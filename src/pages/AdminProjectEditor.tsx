@@ -31,13 +31,13 @@ export default function AdminProjectEditor() {
   
   const [projectInfo, setProjectInfo] = useState({
     id: editProject?.id || null,
-    title: editProject?.name || "", 
-    category: editProject?.category?.name || "", 
+    title: editProject?.name || editProject?.title || "", 
+    category: editProject?.category?.name || editProject?.category || "", 
     style: editProject?.style || "MODERN", 
     area: editProject?.area || "", 
-    cost: editProject?.constructionCost || "", 
-    thumbnail: editProject?.titleImage || "",
-    gallery: editProject?.images?.map((img: any) => img.url) || [],
+    cost: editProject?.constructionCost || editProject?.cost || "", 
+    thumbnail: editProject?.titleImage || editProject?.thumbnail || "",
+    gallery: (editProject?.images?.map((img: any) => img.url) || editProject?.gallery) || [],
     description: editProject?.description || "",
     content: editProject?.content || "",
     video: editProject?.video || ""
@@ -383,6 +383,16 @@ export default function AdminProjectEditor() {
       mappedStyle = rawStyle;
     }
 
+    // Generate a proper slug
+    const slug = (projectInfo.title || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .replace(/[^a-z0-9\s]/g, "")
+      .replace(/\s+/g, "-")
+      .trim();
+
     const projectData = {
       name: projectInfo.title,
       area: parseInt(projectInfo.area) || 0,
@@ -390,7 +400,7 @@ export default function AdminProjectEditor() {
       style: mappedStyle,
       titleImage: projectInfo.thumbnail,
       type: mappedType,
-      slug: projectInfo.title.toLowerCase().replace(/ /g, '-'),
+      slug: slug,
       content: fullContent,
       status: "ACTIVE",
       categoryId: mappedCategoryId,
@@ -401,15 +411,15 @@ export default function AdminProjectEditor() {
     try {
       let res;
       if (projectInfo.id) {
-        // Update existing project
-        res = await fetch(`https://api.kientrucmaihuong.com/api/project/${projectInfo.id}`, {
+        // Update existing project using PUT with id in the BODY matching UpdateProjectRequest
+        res = await fetch(`${API_BASE}/api/project`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...projectData, id: projectInfo.id })
         });
       } else {
         // Create new project
-        res = await fetch('https://api.kientrucmaihuong.com/api/project', {
+        res = await fetch(`${API_BASE}/api/project`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(projectData)

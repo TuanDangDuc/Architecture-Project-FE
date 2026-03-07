@@ -18,14 +18,14 @@ export default function Videos() {
           id: video.id,
           title: video.title,
           thumbnail:
-            video.thumbnail ||
-            `https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`,
+            video.thumbnailUrl ||
+            `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`,
           duration: video.duration,
           views: formatViews(video.views),
-          date: new Date(video.created_at).toLocaleDateString("vi-VN"),
-          category: video.category,
-          youtubeId: video.youtube_id,
-          projectId: video.project_id,
+          date: new Date(video.createdAt).toLocaleDateString("vi-VN"),
+          category: typeof video.category === 'object' ? video.category?.name : video.category,
+          youtubeId: video.youtubeId,
+          projectId: video.projectId,
         }));
         setVideos(formattedVideos);
       })

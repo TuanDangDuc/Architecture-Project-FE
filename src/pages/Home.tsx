@@ -203,10 +203,10 @@ export default function Home() {
                   <Link to={`/projects/${project.id}`}>
                     <img
                       src={
-                        project.thumbnail ||
+                        project.titleImage ||
                         `https://loremflickr.com/800/1000/architecture?lock=${project.id}`
                       }
-                      alt={project.title}
+                      alt={project.name}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       referrerPolicy="no-referrer"
@@ -225,11 +225,11 @@ export default function Home() {
                           : project.category}
                       </span>
                       <h3 className="text-xl md:text-2xl font-serif font-bold text-[var(--color-charcoal)] mb-2">
-                        {project.title}
+                        {project.name}
                       </h3>
                       <div className="text-[var(--color-charcoal)]/80 text-sm font-medium">
                         Diện Tích: {project.area} m² / Chi Phí:{" "}
-                        {project.cost || "Liên hệ"}
+                        {project.constructionCost || "Liên hệ"}
                       </div>
                     </div>
                   </Link>

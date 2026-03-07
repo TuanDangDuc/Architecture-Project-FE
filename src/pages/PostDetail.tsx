@@ -40,7 +40,11 @@ export default function PostDetail() {
         // Filter related posts (same category, exclude current)
         const related = allPosts
           .filter(
-            (p: any) => p.category === post?.category && p.id !== Number(id),
+            (p: any) => {
+              const pCat = typeof p.category === 'object' ? p.category?.name : p.category;
+              const postCat = typeof post?.category === 'object' ? post?.category?.name : post?.category;
+              return pCat === postCat && p.id !== Number(id);
+            }
           )
           .slice(0, 3);
 
@@ -146,7 +150,7 @@ export default function PostDetail() {
                         size={16}
                         className="mr-2 text-[var(--color-gold)]"
                       />{" "}
-                      {new Date(post.created_at).toLocaleDateString("vi-VN")}
+                      {new Date(post.createdAt || post.uploadAt).toLocaleDateString("vi-VN")}
                     </div>
                     <div className="flex items-center">
                       <User
@@ -176,7 +180,7 @@ export default function PostDetail() {
               <div className="w-full aspect-video relative">
                 <img
                   src={
-                    post.thumbnail ||
+                    post.titleImage ||
                     `https://loremflickr.com/1920/800/architecture?lock=${post.id}`
                   }
                   alt={post.title}
@@ -242,7 +246,7 @@ export default function PostDetail() {
                     <div className="aspect-[4/3] overflow-hidden">
                       <img
                         src={
-                          p.thumbnail ||
+                          p.titleImage ||
                           `https://loremflickr.com/400/300/architecture?lock=${p.id}`
                         }
                         alt={p.title}
@@ -252,7 +256,7 @@ export default function PostDetail() {
                     </div>
                     <div className="p-4">
                       <div className="text-xs text-[var(--color-charcoal)]/50 mb-2">
-                        {new Date(p.created_at).toLocaleDateString("vi-VN")}
+                        {new Date(p.createdAt || p.uploadAt).toLocaleDateString("vi-VN")}
                       </div>
                       <h4 className="font-serif font-bold text-[var(--color-wood)] group-hover:text-[var(--color-gold)] transition-colors line-clamp-2 leading-snug">
                         {p.title}
@@ -328,7 +332,7 @@ export default function PostDetail() {
                     <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden">
                       <img
                         src={
-                          p.thumbnail ||
+                          p.titleImage ||
                           `https://loremflickr.com/200/200/architecture?lock=${p.id}`
                         }
                         alt={p.title}
@@ -341,7 +345,7 @@ export default function PostDetail() {
                         {p.title}
                       </h4>
                       <span className="text-xs text-[var(--color-charcoal)]/50">
-                        {new Date(p.created_at).toLocaleDateString("vi-VN")}
+                        {new Date(p.createdAt || p.uploadAt).toLocaleDateString("vi-VN")}
                       </span>
                     </div>
                   </Link>

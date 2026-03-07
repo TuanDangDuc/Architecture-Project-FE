@@ -32,11 +32,11 @@ export default function AdminPostEditor() {
   const [postInfo, setPostInfo] = useState({
     id: editPost?.id || null,
     title: editPost?.title || "", 
-    category: editPost?.category || "Tin tức", 
-    excerpt: editPost?.excerpt || "", 
-    thumbnail: editPost?.thumbnail || "",
+    category: editPost?.category?.name || editPost?.category || "Tin tức", 
+    excerpt: editPost?.description || editPost?.excerpt || "", 
+    thumbnail: editPost?.titleImage || editPost?.thumbnail || "",
     content: editPost?.content || "",
-    status: editPost?.status || "published"
+    status: editPost?.status === "ACTIVE" ? "published" : (editPost?.status === "DRAFF" ? "draft" : (editPost?.status || "published"))
   });
   
   const [isDragging, setIsDragging] = useState(false);
@@ -242,24 +242,43 @@ export default function AdminPostEditor() {
       fullContent = `<style>${css}</style>${html}`;
     }
     
+    // Generate slug from title
+    const slug = (postInfo.title || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .replace(/[^a-z0-9\s]/g, "")
+      .replace(/\s+/g, "-")
+      .trim();
+
+    const adminId = localStorage.getItem("adminId");
+
     const postData = {
-      ...postInfo,
-      content: fullContent
+      id: postInfo.id,
+      title: postInfo.title,
+      description: postInfo.excerpt, // Map excerpt to description
+      titleImage: postInfo.thumbnail, // Map thumbnail to titleImage
+      content: fullContent,
+      status: postInfo.status === "published" ? "ACTIVE" : "DRAFF", // Map to backend Enum
+      slug: slug,
+      viewQuantity: 0,
+      accountId: adminId
     };
     
     try {
-      if (postInfo.id) {
-        await fetch(`${API_BASE}/api/post/${postInfo.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(postData)
-        });
-      } else {
-        await fetch(`${API_BASE}/api/post`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(postData)
-        });
+      const url = postInfo.id ? `${API_BASE}/api/post` : `${API_BASE}/api/post`;
+      const method = postInfo.id ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Lỗi phản hồi từ server");
       }
       
       alert("Đã lưu bài viết thành công!");

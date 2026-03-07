@@ -91,7 +91,10 @@ export default function Portfolio() {
 
   const filteredProjects = activeCategory === "Tất cả" 
     ? projects 
-    : projects.filter((p: any) => p.category === activeCategory);
+    : projects.filter((p: any) => {
+        const catName = typeof p.category === 'object' ? p.category?.name : p.category;
+        return catName?.toString().toLowerCase() === activeCategory.toLowerCase();
+      });
 
   return (
     <div className="py-24 bg-[var(--color-cream)] min-h-screen">
@@ -163,7 +166,7 @@ export default function Portfolio() {
                       
                       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white/95 via-white/80 to-white/0 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 flex flex-col items-center text-center">
                         <span className="inline-block px-4 py-1 bg-white/50 backdrop-blur-md text-[var(--color-charcoal)] text-xs font-bold tracking-wider uppercase rounded-full mb-2 shadow-sm">
-                          {project.category?.name || "Danh mục"}
+                          {typeof project.category === 'object' ? project.category?.name : (project.category || "Danh mục")}
                         </span>
                         <h3 className="text-xl font-serif font-bold text-[var(--color-charcoal)] mb-2">{project.name}</h3>
                         <div className="text-[var(--color-charcoal)]/80 text-sm font-medium">

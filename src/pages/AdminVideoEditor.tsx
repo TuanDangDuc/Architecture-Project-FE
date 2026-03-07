@@ -11,11 +11,11 @@ export default function AdminVideoEditor() {
   const [videoInfo, setVideoInfo] = useState({
     id: editVideo?.id || null,
     title: editVideo?.title || "", 
-    category: editVideo?.category || "Biệt thự", 
-    youtube_id: editVideo?.youtube_id || "",
+    category: editVideo?.category?.name || editVideo?.category || "Biệt thự", 
+    youtube_id: editVideo?.youtubeId || editVideo?.youtube_id || "",
     duration: editVideo?.duration || "",
-    thumbnail: editVideo?.thumbnail || "",
-    project_id: editVideo?.project_id || ""
+    thumbnail: editVideo?.thumbnailUrl || editVideo?.thumbnail || "",
+    project_id: editVideo?.projectId || editVideo?.project_id || ""
   });
   
   const [projects, setProjects] = useState<any[]>([]);
@@ -75,26 +75,49 @@ export default function AdminVideoEditor() {
   };
 
   const handleSave = async () => {
+    const adminId = localStorage.getItem("adminId");
+    
+    // Transform data to match VideoRequest/UpdateVideoRequest
+    const payload = {
+      id: videoInfo.id,
+      title: videoInfo.title,
+      url: "", // Default empty if not provided
+      thumbnailUrl: videoInfo.thumbnail,
+      youtubeId: videoInfo.youtube_id,
+      category: videoInfo.category,
+      duration: videoInfo.duration,
+      projectId: videoInfo.project_id || null,
+      adminId: adminId
+    };
+
     try {
+      let response;
       if (videoInfo.id) {
-        await fetch(`${API_BASE}/api/video/${videoInfo.id}`, {
+        // Update: PUT to /api/video/{id} using UpdateVideoRequest
+        response = await fetch(`${API_BASE}/api/video/${videoInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(videoInfo)
+          body: JSON.stringify(payload)
         });
       } else {
-        await fetch(`${API_BASE}/api/video`, {
+        // Create: POST to /api/video using VideoRequest
+        response = await fetch(`${API_BASE}/api/video`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(videoInfo)
+          body: JSON.stringify(payload)
         });
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `API Error: ${response.status}`);
       }
       
       alert("Đã lưu video thành công!");
       navigate('/admin');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Lỗi khi lưu:", error);
-      alert("Có lỗi xảy ra khi lưu.");
+      alert("Có lỗi xảy ra khi lưu: " + (error.message || ""));
     }
   };
 

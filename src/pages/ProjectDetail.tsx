@@ -36,6 +36,10 @@ export default function ProjectDetail() {
       .then((data) => {
         setProject(data);
         setLoading(false);
+      })
+      .catch(() => {
+        setProject({ error: true });
+        setLoading(false);
       });
     // Fetch project images from Backblaze
     fetch(`${API_BASE}/api/image/${id}`)
@@ -477,7 +481,7 @@ export default function ProjectDetail() {
                     Hạng mục
                   </span>
                   <span className="font-medium text-[var(--color-charcoal)]">
-                    {project.category}
+                    {typeof project.category === 'object' ? project.category?.name : project.category}
                   </span>
                 </li>
                 <li className="flex justify-between items-center py-2 border-b border-gray-50">
@@ -510,7 +514,7 @@ export default function ProjectDetail() {
                     Chi phí
                   </span>
                   <span className="font-medium text-[var(--color-charcoal)]">
-                    {project.cost || "Liên hệ"}
+                    {project.constructionCost ? `${project.constructionCost} tỷ` : "Liên hệ"}
                   </span>
                 </li>
               </ul>

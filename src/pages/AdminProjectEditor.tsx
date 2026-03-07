@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Save, Plus, Trash2, Link, Image as ImageIcon, Video, FileText, ArrowLeft, UploadCloud, X, Settings, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { Save, Plus, Trash2, Link, Image as ImageIcon, Video, FileText, ArrowLeft, UploadCloud, X, Settings, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Loader2 } from 'lucide-react';
 import { API_BASE } from '../config/api.ts';
 
 export default function AdminProjectEditor() {
@@ -402,14 +402,14 @@ export default function AdminProjectEditor() {
       let res;
       if (projectInfo.id) {
         // Update existing project
-        res = await fetch(`https://api.kientrucmaihuong.com/api/project/${projectInfo.id}`, {
+        res = await fetch(`${API_BASE}/api/project`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...projectData, id: projectInfo.id })
         });
       } else {
         // Create new project
-        res = await fetch('https://api.kientrucmaihuong.com/api/project', {
+        res = await fetch(`${API_BASE}/api/project`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(projectData)
@@ -568,8 +568,8 @@ export default function AdminProjectEditor() {
                       <div className="relative w-full h-full rounded-xl overflow-hidden group">
                         <img src={projectInfo.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <label className="px-4 py-2 bg-white text-gray-800 rounded-lg font-medium cursor-pointer hover:bg-gray-100 transition-colors">
-                            {isUploading ? "Đang tải lên..." : "Đổi ảnh khác"}
+                          <label className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-lg font-medium cursor-pointer hover:bg-gray-100 transition-colors">
+                            {isUploading ? <><Loader2 className="animate-spin" size={18} /> Đang tải lên...</> : "Đổi ảnh khác"}
                             <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={isUploading} />
                           </label>
                         </div>
@@ -577,7 +577,7 @@ export default function AdminProjectEditor() {
                     ) : (
                       <>
                         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 text-[var(--color-wood)]">
-                          <UploadCloud size={32} />
+                          {isUploading ? <Loader2 className="animate-spin" size={32} /> : <UploadCloud size={32} />}
                         </div>
                         <p className="text-gray-600 font-medium mb-1">
                           {isUploading ? "Đang tải lên..." : "Kéo thả ảnh vào đây"}
@@ -607,7 +607,7 @@ export default function AdminProjectEditor() {
                         </div>
                       ))}
                       <label className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--color-wood)] hover:bg-gray-50 transition-all text-gray-400 hover:text-[var(--color-wood)]">
-                        <UploadCloud size={24} className="mb-1" />
+                        {isUploading ? <Loader2 className="animate-spin mb-1" size={24} /> : <UploadCloud size={24} className="mb-1" />}
                         <span className="text-xs font-medium">{isUploading ? "Đang tải..." : "Thêm ảnh"}</span>
                         <input type="file" multiple accept="image/*" className="hidden" onChange={handleGalleryFileSelect} disabled={isUploading} />
                       </label>

@@ -11,6 +11,7 @@ export default function AdminPostEditor() {
 
   const editorRef = useRef<HTMLDivElement>(null);
   const [editor, setEditor] = useState<any>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [step, setStep] = useState<'info' | 'builder'>('info');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -41,6 +42,24 @@ export default function AdminPostEditor() {
   
   const [isDragging, setIsDragging] = useState(false);
 
+  const uploadImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch(`${API_BASE}/api/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.url;
+      }
+    } catch (e) {
+      console.error("Lỗi upload ảnh:", e);
+    }
+    return null;
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -50,28 +69,30 @@ export default function AdminPostEditor() {
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setIsUploading(true);
       const file = e.dataTransfer.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPostInfo({...postInfo, thumbnail: reader.result as string});
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadImage(file);
+      if (url) {
+        setPostInfo({...postInfo, thumbnail: url});
+      }
+      setIsUploading(false);
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      setIsUploading(true);
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPostInfo({...postInfo, thumbnail: reader.result as string});
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadImage(file);
+      if (url) {
+        setPostInfo({...postInfo, thumbnail: url});
+      }
+      setIsUploading(false);
     }
   };
 
@@ -83,6 +104,21 @@ export default function AdminPostEditor() {
       height: '100%',
       width: 'auto',
       storageManager: false,
+      assetManager: {
+        // @ts-ignore - Bypass incorrect TypeScript definition for uploadFile which expects void return but allows Promise
+        async uploadFile(e: any) {
+          const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+          const editor = (this as any).em.get('Editor');
+          
+          Array.from(files).forEach(async (file: any) => {
+            const url = await uploadImage(file);
+            if (url) {
+              editor.AssetManager.add(url);
+            }
+          });
+        },
+        autoAdd: true,
+      },
       selectorManager: { componentFirst: true },
       styleManager: {
         appendTo: '#styles-container',
@@ -229,6 +265,16 @@ export default function AdminPostEditor() {
     setEditor(e);
 
     return () => {
+      // Save content to state before destroying
+      const html = e.getHtml();
+      const css = e.getCss();
+      const updatedContent = `<style>${css}</style>${html}`;
+      
+      setPostInfo(prev => ({
+        ...prev,
+        content: updatedContent
+      }));
+
       e.destroy();
     };
   }, [step]);
@@ -254,8 +300,13 @@ export default function AdminPostEditor() {
 
     const adminId = localStorage.getItem("adminId");
 
-    const postData = {
-      id: postInfo.id,
+    if (!adminId) {
+      alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
+      navigate("/login");
+      return;
+    }
+
+    const postData: any = {
       title: postInfo.title,
       description: postInfo.excerpt, // Map excerpt to description
       titleImage: postInfo.thumbnail, // Map thumbnail to titleImage
@@ -270,6 +321,11 @@ export default function AdminPostEditor() {
       const url = postInfo.id ? `${API_BASE}/api/post` : `${API_BASE}/api/post`;
       const method = postInfo.id ? 'PUT' : 'POST';
 
+      // Only attach ID if it's an update (PUT)
+      if (postInfo.id && method === 'PUT') {
+        postData.id = postInfo.id;
+      }
+
       const response = await fetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
@@ -277,8 +333,8 @@ export default function AdminPostEditor() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Lỗi phản hồi từ server");
+        const err = await response.json().catch(() => ({}));
+        throw new Error(JSON.stringify(err));
       }
       
       alert("Đã lưu bài viết thành công!");
@@ -402,7 +458,12 @@ export default function AdminPostEditor() {
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                   >
-                    {postInfo.thumbnail ? (
+                    {isUploading ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 rounded-xl">
+                        <div className="w-10 h-10 border-4 border-[var(--color-wood)] border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p className="text-gray-500 font-medium">Đang tải ảnh lên...</p>
+                      </div>
+                    ) : postInfo.thumbnail ? (
                       <div className="relative w-full h-full rounded-xl overflow-hidden group">
                         <img src={postInfo.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

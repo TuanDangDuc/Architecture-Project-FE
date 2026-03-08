@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Save, Plus, Trash2, Link, Image as ImageIcon, Video, FileText, ArrowLeft, UploadCloud, X, Settings, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { Save, Plus, Trash2, Link, Image as ImageIcon, Video, FileText, ArrowLeft, UploadCloud, X, Settings, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Loader2 } from 'lucide-react';
 import { API_BASE } from '../config/api.ts';
 
 export default function AdminProjectEditor() {
@@ -169,8 +169,18 @@ export default function AdminProjectEditor() {
       width: 'auto',
       storageManager: false,
       assetManager: {
-        upload: `${API_BASE}/api/upload`,
-        uploadName: 'file',
+        // @ts-ignore - Bypass incorrect TypeScript definition for uploadFile which expects void return but allows Promise
+        async uploadFile(e: any) {
+          const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+          const editor = (this as any).em.get('Editor');
+          
+          Array.from(files).forEach(async (file: any) => {
+            const url = await uploadImage(file);
+            if (url) {
+              editor.AssetManager.add(url);
+            }
+          });
+        },
         autoAdd: true,
       },
       selectorManager: { componentFirst: true },
@@ -347,6 +357,17 @@ export default function AdminProjectEditor() {
     setEditor(e);
 
     return () => {
+      // Save content to state before destroying
+      const html = e.getHtml();
+      const css = e.getCss();
+      const updatedContent = `<style>${css}</style>${html}`;
+      
+      // We must use the setState callback to ensure we have the latest state
+      setProjectInfo(prev => ({
+        ...prev,
+        content: updatedContent
+      }));
+      
       e.destroy();
     };
   }, [step]);
@@ -362,7 +383,12 @@ export default function AdminProjectEditor() {
     }
     
     const adminIdFromStorage = localStorage.getItem("adminId");
-    const MOCK_ADMIN_ID = adminIdFromStorage || "3368b6b0-fa6f-409b-a6df-d91834164bba"; // Temporarily hardcoded for API constraint
+    
+    if (!adminIdFromStorage) {
+      alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
+      navigate("/login");
+      return;
+    }
     
     // Find category ID based on selected name
     const selectedCat = categories.find(c => c.name === projectInfo.category);
@@ -403,16 +429,16 @@ export default function AdminProjectEditor() {
       slug: slug,
       content: fullContent,
       status: "ACTIVE",
-      categoryId: mappedCategoryId,
-      adminId: MOCK_ADMIN_ID,
+      categoryId: mappedCategoryId || null,
+      adminId: adminIdFromStorage,
       images: projectInfo.gallery || []
     };
     
     try {
       let res;
       if (projectInfo.id) {
-        // Update existing project using PUT with id in the BODY matching UpdateProjectRequest
-        res = await fetch(`${API_BASE}/api/project`, {
+        // Update existing project
+        res = await fetch(`https://api.kientrucmaihuong.com/api/project/${projectInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...projectData, id: projectInfo.id })
@@ -578,8 +604,8 @@ export default function AdminProjectEditor() {
                       <div className="relative w-full h-full rounded-xl overflow-hidden group">
                         <img src={projectInfo.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <label className="px-4 py-2 bg-white text-gray-800 rounded-lg font-medium cursor-pointer hover:bg-gray-100 transition-colors">
-                            {isUploading ? "Đang tải lên..." : "Đổi ảnh khác"}
+                          <label className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-lg font-medium cursor-pointer hover:bg-gray-100 transition-colors">
+                            {isUploading ? <><Loader2 className="animate-spin" size={18} /> Đang tải lên...</> : "Đổi ảnh khác"}
                             <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={isUploading} />
                           </label>
                         </div>
@@ -587,7 +613,7 @@ export default function AdminProjectEditor() {
                     ) : (
                       <>
                         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 text-[var(--color-wood)]">
-                          <UploadCloud size={32} />
+                          {isUploading ? <Loader2 className="animate-spin" size={32} /> : <UploadCloud size={32} />}
                         </div>
                         <p className="text-gray-600 font-medium mb-1">
                           {isUploading ? "Đang tải lên..." : "Kéo thả ảnh vào đây"}
@@ -617,7 +643,7 @@ export default function AdminProjectEditor() {
                         </div>
                       ))}
                       <label className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--color-wood)] hover:bg-gray-50 transition-all text-gray-400 hover:text-[var(--color-wood)]">
-                        <UploadCloud size={24} className="mb-1" />
+                        {isUploading ? <Loader2 className="animate-spin mb-1" size={24} /> : <UploadCloud size={24} className="mb-1" />}
                         <span className="text-xs font-medium">{isUploading ? "Đang tải..." : "Thêm ảnh"}</span>
                         <input type="file" multiple accept="image/*" className="hidden" onChange={handleGalleryFileSelect} disabled={isUploading} />
                       </label>

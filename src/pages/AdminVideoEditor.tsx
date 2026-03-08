@@ -77,9 +77,15 @@ export default function AdminVideoEditor() {
   const handleSave = async () => {
     const adminId = localStorage.getItem("adminId");
     
+    if (!adminId) {
+      alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
+      navigate("/login");
+      return;
+    }
+
     // Transform data to match VideoRequest/UpdateVideoRequest
     const payload = {
-      id: videoInfo.id,
+      id: videoInfo.id || null,
       title: videoInfo.title,
       url: "", // Default empty if not provided
       thumbnailUrl: videoInfo.thumbnail,

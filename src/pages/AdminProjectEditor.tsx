@@ -438,7 +438,7 @@ export default function AdminProjectEditor() {
       let res;
       if (projectInfo.id) {
         // Update existing project
-        res = await fetch(`https://api.kientrucmaihuong.com/api/project/${projectInfo.id}`, {
+        res = await fetch(`${API_BASE}/api/project`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...projectData, id: projectInfo.id })

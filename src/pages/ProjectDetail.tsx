@@ -36,6 +36,10 @@ export default function ProjectDetail() {
       .then((data) => {
         setProject(data);
         setLoading(false);
+      })
+      .catch(() => {
+        setProject({ error: true });
+        setLoading(false);
       });
     // Fetch project images from Backblaze
     fetch(`${API_BASE}/api/image/${id}`)
@@ -97,9 +101,14 @@ export default function ProjectDetail() {
     );
   }
 
-  const galleryImages =
-    project.gallery && project.gallery.length > 0
-      ? [project.titleImage, ...project.gallery]
+  // Build gallery from fetched images, falling back to project data
+  const galleryImages = projectImages.length > 0
+    ? [
+        project.titleImage || project.thumbnail,
+        ...projectImages.map((img: any) => (typeof img === 'string' ? img : img.url)),
+      ].filter(Boolean)
+    : project.gallery && project.gallery.length > 0
+      ? [project.titleImage || project.thumbnail, ...project.gallery]
       : [
           project.titleImage ||
             `https://loremflickr.com/1920/1080/architecture?lock=${project.id}`,
@@ -507,7 +516,7 @@ export default function ProjectDetail() {
                     Chi phí
                   </span>
                   <span className="font-medium text-[var(--color-charcoal)]">
-                    {project.constructionCost || "Liên hệ"}
+                    {project.constructionCost ? `${project.constructionCost} tỷ` : "Liên hệ"}
                   </span>
                 </li>
               </ul>

@@ -1,21 +1,32 @@
 import { API_BASE } from "../config/api.ts";
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Calendar, User, ArrowRight } from "lucide-react";
 
 export default function Posts() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const categoryFilter = searchParams.get("category");
 
   useEffect(() => {
     fetch(`${API_BASE}/api/post`)
       .then((res) => res.json())
       .then((data) => {
         // Filter only published posts
-        const publishedPosts = data.filter(
+        let publishedPosts = data.filter(
           (p: any) => p.status === "ACTIVE",
         );
+
+        if (categoryFilter) {
+          publishedPosts = publishedPosts.filter((p: any) => {
+            let cName = typeof p.category === 'object' ? p.category?.name : p.category;
+            cName = cName || "Tin tức";
+            return cName === categoryFilter;
+          });
+        }
+        
         setPosts(publishedPosts);
         setLoading(false);
       })
@@ -23,7 +34,7 @@ export default function Posts() {
         console.error("Error fetching posts:", err);
         setLoading(false);
       });
-  }, []);
+  }, [categoryFilter]);
 
   if (loading) {
     return (
@@ -44,9 +55,24 @@ export default function Posts() {
             Cập nhật những xu hướng thiết kế mới nhất, kinh nghiệm xây nhà và
             các kiến thức hữu ích về kiến trúc, nội thất.
           </p>
+          {categoryFilter && (
+            <div className="mt-6 flex justify-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-gold)]/10 text-[var(--color-wood)] font-medium rounded-full border border-[var(--color-gold)]/30">
+                <span>Danh mục: {categoryFilter}</span>
+                <Link to="/posts" className="hover:text-[var(--color-gold)] ml-2 transition-colors">
+                  × Bỏ lọc
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {posts.length === 0 && (
+            <div className="col-span-full text-center py-12 text-gray-500">
+              Không có bài viết nào trong danh mục này.
+            </div>
+          )}
           {posts.map((post, index) => (
             <motion.div
               key={post.id}
@@ -73,8 +99,8 @@ export default function Posts() {
                 <div className="absolute top-4 left-4">
                   <span className="inline-block px-3 py-1 bg-[var(--color-wood)] text-white text-xs font-bold tracking-wider uppercase rounded-full shadow-sm">
                     {typeof post.category === "object"
-                      ? post.category?.name
-                      : post.category}
+                      ? post.category?.name || "Tin tức"
+                      : post.category || "Tin tức"}
                   </span>
                 </div>
               </Link>

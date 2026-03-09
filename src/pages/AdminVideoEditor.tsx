@@ -1,7 +1,8 @@
 import { API_BASE } from '../config/api.ts';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, UploadCloud, Image as ImageIcon, PlayCircle, X } from 'lucide-react';
+import { ArrowLeft, Save, UploadCloud, Image as ImageIcon, PlayCircle, Eye, Clock, Tag, Link2, Loader2 } from 'lucide-react';
+import { fetchYoutubeViews, formatViews } from '../utils/youtube.ts';
 
 export default function AdminVideoEditor() {
   const location = useLocation();
@@ -15,18 +16,92 @@ export default function AdminVideoEditor() {
     youtube_id: editVideo?.youtubeId || editVideo?.youtube_id || "",
     duration: editVideo?.duration || "",
     thumbnail: editVideo?.thumbnailUrl || editVideo?.thumbnail || "",
-    project_id: editVideo?.projectId || editVideo?.project_id || ""
+    project_id: editVideo?.projectId || editVideo?.project_id || "",
+    link_url: editVideo?.linkUrl || editVideo?.link_url || ""
   });
   
   const [projects, setProjects] = useState<any[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [youtubeStats, setYoutubeStats] = useState<{ views: string; duration: string } | null>(null);
+  const [isFetchingStats, setIsFetchingStats] = useState(false);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/project`)
       .then(res => res.json())
-      .then(data => setProjects(data))
+      .then(data => {
+        // API returns array of projects with `name` field (not `title`)
+        setProjects(Array.isArray(data) ? data : []);
+      })
       .catch(err => console.error("Error fetching projects:", err));
   }, []);
+
+  // Fetch YouTube stats when youtube_id is valid
+  useEffect(() => {
+    const id = videoInfo.youtube_id;
+    if (!id || id.length !== 11) {
+      setYoutubeStats(null);
+      return;
+    }
+
+    setIsFetchingStats(true);
+    // Fetch views via proxy (server.ts) with direct YouTube API fallback
+    fetchYoutubeViews([id])
+      .then(statsMap => {
+        const views = statsMap[id];
+        if (views !== undefined) {
+          setYoutubeStats(prev => ({ duration: prev?.duration || "", views: formatViews(views) }));
+        }
+      })
+      .catch(() => {})
+      .finally(() => {});
+
+    // Separately fetch duration via YouTube oEmbed (no key needed)
+    fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${id}&key=${(import.meta as any).env?.VITE_YOUTUBE_API_KEY || ""}`)
+      .then(r => r.json())
+      .then(data => {
+        const item = data.items?.[0];
+        if (item) {
+          const isoDuration = item.contentDetails?.duration || "";
+          const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+          let durationStr = "";
+          if (match) {
+            const h = parseInt(match[1] || "0");
+            const m = parseInt(match[2] || "0");
+            const s = parseInt(match[3] || "0");
+            durationStr = h > 0
+              ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+              : `${m}:${String(s).padStart(2, "0")}`;
+          }
+          if (durationStr) {
+            setYoutubeStats(prev => ({ views: prev?.views || "---", duration: durationStr }));
+            if (!videoInfo.duration) {
+              setVideoInfo(prev => ({ ...prev, duration: durationStr }));
+            }
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsFetchingStats(false));
+  }, [videoInfo.youtube_id]);
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch(`${API_BASE}/api/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.url;
+      }
+    } catch (e) {
+      console.error("Lỗi upload ảnh:", e);
+    }
+    return null;
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -37,28 +112,34 @@ export default function AdminVideoEditor() {
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setIsUploading(true);
       const file = e.dataTransfer.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setVideoInfo({...videoInfo, thumbnail: reader.result as string});
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadImage(file);
+      if (url) {
+        setVideoInfo({...videoInfo, thumbnail: url});
+      } else {
+        alert("Có lỗi xảy ra khi tải ảnh lên.");
+      }
+      setIsUploading(false);
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      setIsUploading(true);
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setVideoInfo({...videoInfo, thumbnail: reader.result as string});
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadImage(file);
+      if (url) {
+        setVideoInfo({...videoInfo, thumbnail: url});
+      } else {
+        alert("Có lỗi xảy ra khi tải ảnh lên.");
+      }
+      setIsUploading(false);
     }
   };
 
@@ -83,30 +164,29 @@ export default function AdminVideoEditor() {
       return;
     }
 
-    // Transform data to match VideoRequest/UpdateVideoRequest
     const payload = {
       id: videoInfo.id || null,
       title: videoInfo.title,
-      url: "", // Default empty if not provided
+      // URL must be populated, backend uses it as the link to the video
+      url: videoInfo.youtube_id ? `https://www.youtube.com/watch?v=${videoInfo.youtube_id}` : "",
       thumbnailUrl: videoInfo.thumbnail,
       youtubeId: videoInfo.youtube_id,
       category: videoInfo.category,
       duration: videoInfo.duration,
       projectId: videoInfo.project_id || null,
-      adminId: adminId
+      adminId: adminId,
+      linkUrl: videoInfo.link_url || ""
     };
 
     try {
       let response;
       if (videoInfo.id) {
-        // Update: PUT to /api/video/{id} using UpdateVideoRequest
         response = await fetch(`${API_BASE}/api/video/${videoInfo.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
       } else {
-        // Create: POST to /api/video using VideoRequest
         response = await fetch(`${API_BASE}/api/video`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -179,14 +259,53 @@ export default function AdminVideoEditor() {
                   </div>
                 )}
               </div>
+
+              {/* YouTube Stats Panel */}
+              {videoInfo.youtube_id && videoInfo.youtube_id.length === 11 && (
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <PlayCircle size={16} className="text-red-500" />
+                    Thông số từ YouTube
+                    {isFetchingStats && <Loader2 size={14} className="animate-spin text-gray-400" />}
+                  </h4>
+                  {youtubeStats ? (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Eye size={14} className="text-blue-500 shrink-0" />
+                        <span className="font-medium">{youtubeStats.views}</span>
+                        <span className="text-gray-400">lượt xem</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Clock size={14} className="text-green-500 shrink-0" />
+                        <span className="font-medium">{youtubeStats.duration}</span>
+                        <span className="text-gray-400">thời lượng</span>
+                      </div>
+                    </div>
+                  ) : (
+                    !isFetchingStats && (
+                      <p className="text-xs text-gray-400">
+                        {import.meta.env.VITE_YOUTUBE_API_KEY
+                          ? "Không thể lấy thông số (video không tồn tại hoặc bị giới hạn)"
+                          : "Thêm VITE_YOUTUBE_API_KEY vào .env để lấy thống kê từ YouTube"}
+                      </p>
+                    )
+                  )}
+                </div>
+              )}
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Thời lượng</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Clock size={14} className="inline mr-1 text-gray-400" />
+                    Thời lượng
+                  </label>
                   <input type="text" value={videoInfo.duration} onChange={e => setVideoInfo({...videoInfo, duration: e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all" placeholder="Ví dụ: 15:20" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Danh mục</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Tag size={14} className="inline mr-1 text-gray-400" />
+                    Danh mục
+                  </label>
                   <select value={videoInfo.category} onChange={e => setVideoInfo({...videoInfo, category: e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all cursor-pointer">
                     <option>Biệt thự</option>
                     <option>Nhà phố</option>
@@ -199,16 +318,37 @@ export default function AdminVideoEditor() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Liên kết dự án (Tùy chọn)</label>
-                <select value={videoInfo.project_id} onChange={e => setVideoInfo({...videoInfo, project_id: e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all cursor-pointer">
-                  <option value="">-- Chọn dự án liên quan --</option>
-                  {projects.map(p => (
-                    <option key={p.id} value={p.id}>{p.title}</option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Liên kết video này với một dự án đã có để hiển thị nút "Xem chi tiết dự án".</p>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Link2 size={14} className="inline mr-1 text-gray-400" />
+                    Liên kết dự án (Tùy chọn)
+                  </label>
+                  <select
+                    value={videoInfo.project_id}
+                    onChange={e => {
+                      const selectedId = e.target.value;
+                      setVideoInfo(prev => ({
+                        ...prev,
+                        project_id: selectedId,
+                        // Auto-fill linkUrl with project route
+                        link_url: selectedId ? `/projects/${selectedId}` : ""
+                      }));
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all cursor-pointer"
+                  >
+                    <option value="">-- Chọn dự án liên quan --</option>
+                    {projects.map(p => (
+                      <option key={p.id} value={p.id}>{p.name || p.title || `Dự án #${p.id}`}</option>
+                    ))}
+                  </select>
+                  {projects.length === 0 && (
+                    <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                      <Loader2 size={12} className="animate-spin" />
+                      Đang tải danh sách dự án...
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">Chọn dự án để tự động liên kết nút "Xem dự án" trên trang người dùng.</p>
+                </div>
             </div>
 
             <div>
@@ -226,22 +366,24 @@ export default function AdminVideoEditor() {
                   <div className="relative w-full h-full rounded-xl overflow-hidden group">
                     <img src={videoInfo.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <label className="px-4 py-2 bg-white text-gray-800 rounded-lg font-medium cursor-pointer hover:bg-gray-100 transition-colors">
-                        Đổi ảnh khác
-                        <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
+                      <label className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-lg font-medium cursor-pointer hover:bg-gray-100 transition-colors">
+                        {isUploading ? <><Loader2 className="animate-spin" size={18} /> Đang tải lên...</> : "Đổi ảnh khác"}
+                        <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={isUploading} />
                       </label>
                     </div>
                   </div>
                 ) : (
                   <>
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 text-[var(--color-wood)]">
-                      <UploadCloud size={32} />
+                      {isUploading ? <Loader2 size={32} className="animate-spin" /> : <UploadCloud size={32} />}
                     </div>
-                    <p className="text-gray-600 font-medium mb-1">Kéo thả ảnh vào đây</p>
+                    <p className="text-gray-600 font-medium mb-1">
+                      {isUploading ? "Đang tải lên Backblaze..." : "Kéo thả ảnh vào đây"}
+                    </p>
                     <p className="text-sm text-gray-400 mb-4">hoặc</p>
                     <label className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium cursor-pointer hover:bg-gray-50 transition-colors shadow-sm">
                       Chọn ảnh từ máy tính
-                      <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
+                      <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={isUploading} />
                     </label>
                   </>
                 )}
@@ -253,7 +395,13 @@ export default function AdminVideoEditor() {
                   <div className="bg-gray-100 p-3 rounded-l-lg border border-r-0 border-gray-300 text-gray-500">
                     <ImageIcon size={18} />
                   </div>
-                  <input type="text" value={videoInfo.thumbnail} onChange={e => setVideoInfo({...videoInfo, thumbnail: e.target.value})} className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all" placeholder="https://..." />
+                  <input
+                    type="text"
+                    value={videoInfo.thumbnail}
+                    onChange={e => setVideoInfo({...videoInfo, thumbnail: e.target.value})}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-[var(--color-wood)] focus:border-transparent outline-none transition-all"
+                    placeholder="https://..."
+                  />
                 </div>
               </div>
               
@@ -262,7 +410,7 @@ export default function AdminVideoEditor() {
                   <PlayCircle size={18} /> Lưu ý về Thumbnail
                 </h4>
                 <p className="text-sm text-blue-600">
-                  Nếu bạn không tải ảnh lên, hệ thống sẽ cố gắng lấy ảnh thumbnail tự động từ YouTube (nếu có thể) khi hiển thị ngoài trang chủ. Tuy nhiên, tốt nhất bạn nên tải lên một ảnh chất lượng cao để hiển thị đẹp nhất.
+                  Ảnh sẽ được tải lên Backblaze và lưu dưới dạng URL. Nếu không tải ảnh lên, hệ thống sẽ tự động lấy thumbnail từ YouTube.
                 </p>
               </div>
             </div>

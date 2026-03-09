@@ -1,6 +1,8 @@
 import { API_BASE } from "../config/api.ts";
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { fetchYoutubeViews, formatViews, extractYoutubeId } from "../utils/youtube.ts";
+
 import {
   LayoutDashboard,
   FolderKanban,
@@ -60,6 +62,29 @@ export default function Admin() {
     fetchData();
   }, []);
 
+  const fetchYoutubeViewsAndUpdate = async (videoList: any[]) => {
+    const ids = videoList.map((v: any) => v.youtubeId).filter(Boolean);
+    if (ids.length === 0) {
+      setVideos((prev: any[]) => prev.map((v: any) => ({ ...v, ytLoaded: true })));
+      return;
+    }
+    
+    try {
+      const statsMap = await fetchYoutubeViews(ids);
+      setVideos((prev: any[]) =>
+        prev.map((v: any) => {
+          const ytId = extractYoutubeId(v.youtubeId);
+          const ytViews = statsMap[ytId];
+          return ytViews !== undefined 
+            ? { ...v, views: ytViews, ytLoaded: true } 
+            : { ...v, ytLoaded: true };
+        })
+      );
+    } catch {
+      setVideos((prev: any[]) => prev.map((v: any) => ({ ...v, ytLoaded: true })));
+    }
+  };
+
   const fetchData = () => {
     fetch(`${API_BASE}/api/stats`)
       .then((res) => res.json())
@@ -70,12 +95,21 @@ export default function Admin() {
     fetch(`${API_BASE}/api/ticket`)
       .then((res) => res.json())
       .then(setConsultations);
-    fetch(`${API_BASE}/api/post`)
-      .then((res) => res.json())
-      .then(setPosts);
+    const adminId = localStorage.getItem("adminId");
+    if (adminId) {
+      fetch(`${API_BASE}/api/post/account/${adminId}`)
+        .then((res) => res.json())
+        .then(setPosts)
+        .catch(err => console.error("Error fetching admin posts:", err));
+    } else {
+      setPosts([]);
+    }
     fetch(`${API_BASE}/api/video`)
       .then((res) => res.json())
-      .then(setVideos);
+      .then((data) => {
+        setVideos(data);
+        fetchYoutubeViewsAndUpdate(data);
+      });
   };
 
   const handleAddProject = async (e: React.FormEvent) => {
@@ -515,8 +549,14 @@ export default function Admin() {
                           ? v.category?.name
                           : v.category}
                       </td>
-                      <td className="p-4 text-gray-600">{v.duration}</td>
-                      <td className="p-4 text-gray-600">{v.views}</td>
+                      <td className="p-4 text-gray-600">{v.duration || "---"}</td>
+                      <td className="p-4 text-gray-600">
+                        {v.views > 0 
+                          ? formatViews(v.views) 
+                          : v.ytLoaded 
+                            ? "---" 
+                            : <span className="opacity-50">Đang tải...</span>}
+                      </td>
                       <td className="p-4 text-right space-x-2">
                         <button
                           onClick={() =>

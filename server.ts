@@ -828,6 +828,35 @@ async function startServer() {
     res.json({ success: true });
   });
 
+  // --- YouTube Views Proxy ---
+  // Frontend calls /api/youtube/views?ids=id1,id2 and gets { id: views } map
+  // API key is kept server-side via YOUTUBE_API_KEY env variable
+  app.get("/api/youtube/views", async (req, res) => {
+    const ids = (req.query.ids as string || "").trim();
+    if (!ids) return res.json({});
+
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    if (!apiKey) {
+      // No key configured — return empty so frontend falls back to DB values
+      return res.json({});
+    }
+
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${apiKey}`
+      );
+      const data = await response.json() as any;
+      const result: Record<string, number> = {};
+      (data.items || []).forEach((item: any) => {
+        result[item.id] = parseInt(item.statistics?.viewCount || "0");
+      });
+      res.json(result);
+    } catch (err) {
+      console.error("YouTube API error:", err);
+      res.json({});
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

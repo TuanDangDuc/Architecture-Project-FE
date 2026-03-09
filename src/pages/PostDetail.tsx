@@ -20,6 +20,7 @@ export default function PostDetail() {
   const [post, setPost] = useState<any>(null);
   const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,8 +42,12 @@ export default function PostDetail() {
         const related = allPosts
           .filter(
             (p: any) => {
-              const pCat = typeof p.category === 'object' ? p.category?.name : p.category;
-              const postCat = typeof post?.category === 'object' ? post?.category?.name : post?.category;
+              const pCatObj = typeof p.category === 'object' ? p.category?.name : p.category;
+              const postCatObj = typeof post?.category === 'object' ? post?.category?.name : post?.category;
+              
+              const pCat = pCatObj || "Tin tức";
+              const postCat = postCatObj || "Tin tức";
+              
               return pCat === postCat && p.id !== Number(id);
             }
           )
@@ -60,6 +65,19 @@ export default function PostDetail() {
         }
 
         setRelatedPosts(related);
+
+        // Calculate real category counts
+        const catCounts: Record<string, number> = {};
+        allPosts.forEach((p: any) => {
+          if (p.status !== "ACTIVE") return;
+          let cName = typeof p.category === 'object' ? p.category?.name : p.category;
+          cName = cName || "Tin tức";
+          
+          if (cName) {
+            catCounts[cName] = (catCounts[cName] || 0) + 1;
+          }
+        });
+        setCategoryCounts(catCounts);
 
         // Get recent posts for sidebar
         setRecentPosts(
@@ -131,8 +149,8 @@ export default function PostDetail() {
                 <div className="flex items-center gap-3 mb-6">
                   <span className="inline-block px-3 py-1 bg-[var(--color-gold)] text-white text-xs font-bold tracking-wider uppercase rounded-full shadow-sm">
                     {typeof post.category === "object"
-                      ? post.category?.name
-                      : post.category}
+                      ? post.category?.name || "Tin tức"
+                      : post.category || "Tin tức"}
                   </span>
                   <span className="text-xs text-[var(--color-charcoal)]/50 flex items-center font-medium">
                     <Clock size={14} className="mr-1" /> 5 phút đọc
@@ -270,22 +288,6 @@ export default function PostDetail() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-8">
-            {/* Search Widget - Placeholder */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-[var(--color-beige)]">
-              <h3 className="font-serif font-bold text-lg text-[var(--color-wood)] mb-4 pb-2 border-b border-[var(--color-beige)]">
-                Tìm kiếm
-              </h3>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm bài viết..."
-                  className="w-full px-4 py-2 bg-[var(--color-cream)] border border-[var(--color-beige)] rounded-lg focus:outline-none focus:border-[var(--color-gold)] transition-colors"
-                />
-                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-charcoal)]/50 hover:text-[var(--color-gold)]">
-                  <ArrowLeft size={18} className="rotate-180" />
-                </button>
-              </div>
-            </div>
 
             {/* Categories Widget */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-[var(--color-beige)]">
@@ -293,27 +295,24 @@ export default function PostDetail() {
                 Danh mục
               </h3>
               <ul className="space-y-2">
-                {[
-                  "Kiến thức",
-                  "Xu hướng",
-                  "Kinh nghiệm",
-                  "Phong thủy",
-                  "Giải pháp",
-                ].map((cat, idx) => (
-                  <li key={idx}>
+                {Object.entries(categoryCounts).map(([cat, count]) => (
+                  <li key={cat}>
                     <Link
-                      to="/posts"
+                      to={`/posts?category=${encodeURIComponent(cat)}`}
                       className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-[var(--color-cream)] transition-colors group"
                     >
                       <span className="text-[var(--color-charcoal)]/80 group-hover:text-[var(--color-wood)] font-medium">
                         {cat}
                       </span>
                       <span className="text-xs bg-[var(--color-beige)] text-[var(--color-charcoal)]/60 px-2 py-0.5 rounded-full group-hover:bg-[var(--color-gold)] group-hover:text-white transition-colors">
-                        {Math.floor(Math.random() * 10) + 1}
+                        {count}
                       </span>
                     </Link>
                   </li>
                 ))}
+                {Object.keys(categoryCounts).length === 0 && (
+                  <li className="text-sm text-gray-400 py-2 px-3">Chưa có danh mục nào</li>
+                )}
               </ul>
             </div>
 

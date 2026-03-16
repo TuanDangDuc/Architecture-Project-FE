@@ -13,22 +13,6 @@ pipeline {
       }
     }
 
-    stage('Install dependencies') {
-      steps {
-        sh '''
-          rm -rf node_modules
-          npm install
-          npm rebuild
-        '''
-      }
-    }
-
-    stage('Build project') {
-      steps {
-        sh 'npm run build'
-      }
-    }
-
     stage('Publish Docker image') {
       steps {
         script {

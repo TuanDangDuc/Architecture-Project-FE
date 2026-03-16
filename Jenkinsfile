@@ -12,16 +12,8 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                sh 'npm install'
+                sh 'npm ci'
                 sh 'npm run build'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER .'
-                }
             }
         }
     }

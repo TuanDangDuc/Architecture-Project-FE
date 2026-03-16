@@ -13,7 +13,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 sh 'rm -rf node_modules package-lock.json'
-                sh 'npm install'
+                sh 'npm ci'
                 sh 'npm run build'
             }
         }

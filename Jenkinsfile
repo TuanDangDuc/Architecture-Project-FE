@@ -1,9 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:18'
-    }
-  }
+  agent any
 
   stages {
 
@@ -13,22 +9,24 @@ pipeline {
       }
     }
 
-    stage('Publish Docker image') {
+    stage('Build Docker image') {
       steps {
         script {
+
           docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
 
             def commitHash = env.GIT_COMMIT.take(7)
 
             def dockerImage = docker.build(
               "ductuanbl2000/fe-architecture-app:${commitHash}",
-              "./"
+              "."
             )
 
             dockerImage.push()
             dockerImage.push("latest")
             dockerImage.push("dev")
           }
+
         }
       }
     }
@@ -36,7 +34,6 @@ pipeline {
   }
 
   post {
-
     success {
       echo 'Build and push Docker image SUCCESS'
     }
@@ -44,6 +41,5 @@ pipeline {
     failure {
       echo 'Build FAILED'
     }
-
   }
 }

@@ -1,8 +1,10 @@
 pipeline {
   agent {
-    docker { image 'node:18'}
+    docker {
+      image 'node:18'
+    }
+
   }
-  
   stages {
     stage('Checkout') {
       steps {
@@ -22,7 +24,7 @@ pipeline {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
             def commitHash = env.GIT_COMMIT.take(7)
-            def dockerImage = docker.build("ductuanbl2000/sysfoo:${commitHash}", "./")
+            def dockerImage = docker.build("ductuanbl2000/fe-architecture-app:${commitHash}", "./")
             dockerImage.push()
             dockerImage.push("latest")
             dockerImage.push("dev")

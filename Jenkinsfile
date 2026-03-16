@@ -1,10 +1,19 @@
 pipeline {
-  agent any
+  agent {
+    docker { image 'node:18'}
+  }
   
   stages {
     stage('Checkout') {
       steps {
         git(branch: 'main', url: 'https://github.com/TuanDangDuc/Architecture-Project-FE.git')
+      }
+    }
+
+    stage('build') {
+      steps {
+        sh 'npm ci'
+        sh 'npm run build
       }
     }
 

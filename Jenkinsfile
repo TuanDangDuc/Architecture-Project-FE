@@ -14,6 +14,7 @@ pipeline {
 
     stage('build') {
       steps {
+        sh 'cat package-lock.json'
         sh 'npm ci'
         sh 'npm run build'
       }

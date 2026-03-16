@@ -5,8 +5,8 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN npm ci
-
-COPY . .
+RUN npm install @tailwindcss/oxide-linux-x64-gnu
+OPY . .
 
 RUN npm run build
 

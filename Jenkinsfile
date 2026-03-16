@@ -1,8 +1,6 @@
 pipeline {
   agent any
-
   stages {
-
     stage('Checkout') {
       steps {
         git(branch: 'main', url: 'https://github.com/TuanDangDuc/Architecture-Project-FE.git')
@@ -12,7 +10,6 @@ pipeline {
     stage('Build Docker image') {
       steps {
         script {
-
           docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
 
             def commitHash = env.GIT_COMMIT.take(7)
@@ -26,13 +23,21 @@ pipeline {
             dockerImage.push("latest")
             dockerImage.push("dev")
           }
-
         }
+
+      }
+    }
+
+    stage('trigger deploy') {
+      steps {
+        script {
+          build job: 'Deploy', wait: false
+        }
+
       }
     }
 
   }
-
   post {
     success {
       echo 'Build and push Docker image SUCCESS'
@@ -41,5 +46,6 @@ pipeline {
     failure {
       echo 'Build FAILED'
     }
+
   }
 }

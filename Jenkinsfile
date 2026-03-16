@@ -14,9 +14,10 @@ pipeline {
 
     stage('build') {
       steps {
-        sh 'cat package-lock.json'
-        sh 'npm ci'
-        sh 'npm run build'
+        rm -rf node_modules
+        rm -f package-lock.json
+        npm install
+        npm run build
       }
     }
 

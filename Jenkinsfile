@@ -1,10 +1,6 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:18'
-    }
-
-  }
+  agent any
+  
   stages {
     stage('Checkout') {
       steps {
@@ -12,7 +8,7 @@ pipeline {
       }
     }
 
-    stage('Build & Test') {
+    stage('Publish image') {
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {

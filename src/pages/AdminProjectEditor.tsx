@@ -49,12 +49,39 @@ export default function AdminProjectEditor() {
     fetch('https://api.kientrucmaihuong.com/api/category')
       .then(res => res.json())
       .then(data => {
-        setCategories(data);
-        if (data.length > 0 && !projectInfo.category) {
-          setProjectInfo(prev => ({ ...prev, category: data[0].name }));
+        if (data && data.length > 0) {
+          setCategories(data);
+          if (!projectInfo.category) {
+            setProjectInfo(prev => ({ ...prev, category: data[0].name }));
+          }
+        } else {
+          const fallbackCategories = [
+            { id: 'fb-1', name: 'Nhà phố' },
+            { id: 'fb-2', name: 'Biệt thự' },
+            { id: 'fb-3', name: 'Nhà vườn' },
+            { id: 'fb-4', name: 'Nội thất' },
+            { id: 'fb-5', name: 'Dịch vụ khác' }
+          ];
+          setCategories(fallbackCategories);
+          if (!projectInfo.category) {
+            setProjectInfo(prev => ({ ...prev, category: fallbackCategories[0].name }));
+          }
         }
       })
-      .catch(err => console.error("Lỗi tải danh mục:", err));
+      .catch(err => {
+        console.error("Lỗi tải danh mục:", err);
+        const fallbackCategories = [
+          { id: 'fb-1', name: 'Nhà phố' },
+          { id: 'fb-2', name: 'Biệt thự' },
+          { id: 'fb-3', name: 'Nhà vườn' },
+          { id: 'fb-4', name: 'Nội thất' },
+          { id: 'fb-5', name: 'Dịch vụ khác' }
+        ];
+        setCategories(fallbackCategories);
+        if (!projectInfo.category) {
+          setProjectInfo(prev => ({ ...prev, category: fallbackCategories[0].name }));
+        }
+      });
   }, []);
   
   const [isDragging, setIsDragging] = useState(false);

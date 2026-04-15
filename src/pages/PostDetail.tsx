@@ -195,14 +195,14 @@ export default function PostDetail() {
               </div>
 
               {/* Featured Image */}
-              <div className="w-full aspect-video relative">
+              <div className="w-full max-h-[600px] relative flex items-center justify-center bg-[var(--color-beige)]">
                 <img
                   src={
                     post.titleImage ||
                     `https://loremflickr.com/1920/800/architecture?lock=${post.id}`
                   }
                   alt={post.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   referrerPolicy="no-referrer"
                 />
               </div>

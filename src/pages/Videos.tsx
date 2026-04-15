@@ -117,14 +117,14 @@ export default function Videos() {
             >
               {/* Thumbnail */}
               <div
-                className="relative aspect-video overflow-hidden cursor-pointer"
+                className="relative max-h-[400px] overflow-hidden cursor-pointer flex items-center justify-center bg-[var(--color-beige)]"
                 onClick={() => setActiveVideo(video)}
               >
                 <img
                   src={video.thumbnail}
                   alt={video.title}
                   loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">

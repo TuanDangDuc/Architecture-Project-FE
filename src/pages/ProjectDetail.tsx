@@ -176,13 +176,13 @@ export default function ProjectDetail() {
         </div>
 
         {/* Gallery Section */}
-        <div className="flex flex-col lg:flex-row gap-3 mb-16">
+        <div className="flex flex-col lg:flex-row gap-2 mb-16">
           {/* Main Image */}
-          <div className="lg:flex-1 relative aspect-video rounded-2xl overflow-hidden bg-[var(--color-beige)] shadow-md group">
+          <div className="lg:flex-1 relative w-full lg:max-h-[700px] rounded-2xl overflow-hidden bg-[var(--color-beige)] shadow-md group flex items-center justify-center">
             <img
               src={galleryImages[activeImage]}
               alt={project.name}
-              className="w-full h-full object-cover transition-opacity duration-500"
+              className="w-full h-full object-contain transition-opacity duration-500"
               referrerPolicy="no-referrer"
             />
             <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none z-10">
@@ -192,20 +192,20 @@ export default function ProjectDetail() {
             </div>
             <button
               onClick={prevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/50 hover:bg-white backdrop-blur-md rounded-full flex items-center justify-center text-[var(--color-charcoal)] opacity-0 group-hover:opacity-100 transition-all shadow-md"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/50 hover:bg-white backdrop-blur-md rounded-full flex items-center justify-center text-[var(--color-charcoal)] opacity-0 group-hover:opacity-100 transition-all shadow-md cursor-pointer"
             >
               <ChevronLeft size={24} />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/50 hover:bg-white backdrop-blur-md rounded-full flex items-center justify-center text-[var(--color-charcoal)] opacity-0 group-hover:opacity-100 transition-all shadow-md"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/50 hover:bg-white backdrop-blur-md rounded-full flex items-center justify-center text-[var(--color-charcoal)] opacity-0 group-hover:opacity-100 transition-all shadow-md cursor-pointer"
             >
               <ChevronRight size={24} />
             </button>
           </div>
 
           {/* Thumbnails — sliding window of 5 */}
-          <div className="lg:w-[90px] xl:w-[100px] flex flex-row lg:flex-col gap-1 overflow-hidden pb-2 lg:pb-0">
+          <div className="lg:w-20 xl:w-24 flex flex-row lg:flex-col gap-1 overflow-hidden pb-2 lg:pb-0">
             <AnimatePresence initial={false} mode="popLayout">
               {windowThumbs.map((img: string, i: number) => {
                 const realIdx = thumbStart + i;
@@ -286,7 +286,7 @@ export default function ProjectDetail() {
                   <img
                     src={`https://loremflickr.com/800/500/interior?lock=${project.id}5`}
                     alt="Interior detail"
-                    className="w-full rounded-2xl my-8 object-cover aspect-[16/9]"
+                    className="w-full rounded-2xl my-8 object-contain max-h-[500px]"
                     referrerPolicy="no-referrer"
                   />
                   <h3 className="text-xl font-serif font-bold text-[var(--color-wood)] mt-8 mb-4">
@@ -302,7 +302,7 @@ export default function ProjectDetail() {
                   <img
                     src={`https://loremflickr.com/800/500/architecture?lock=${project.id}6`}
                     alt="Exterior detail"
-                    className="w-full rounded-2xl my-8 object-cover aspect-[16/9]"
+                    className="w-full rounded-2xl my-8 object-contain max-h-[500px]"
                     referrerPolicy="no-referrer"
                   />
                   <h3 className="text-xl font-serif font-bold text-[var(--color-wood)] mt-8 mb-4">
@@ -339,11 +339,11 @@ export default function ProjectDetail() {
                         className="group cursor-pointer"
                         onClick={() => videoInfo && setSelectedVideo(videoInfo)}
                       >
-                        <div className="relative aspect-video rounded-2xl overflow-hidden shadow-sm mb-4 bg-gray-100">
+                        <div className="relative max-h-[400px] rounded-2xl overflow-hidden shadow-sm mb-4 bg-gray-100 flex items-center justify-center">
                           <img
                             src={`https://loremflickr.com/800/450/house?lock=${project.id}${idx}`}
                             alt={`Video ${idx + 1}`}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                             referrerPolicy="no-referrer"
                           />
                           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
@@ -399,7 +399,7 @@ export default function ProjectDetail() {
                         <img
                           src={`https://loremflickr.com/600/400/interior?lock=${project.id}7`}
                           alt="Material detail 1"
-                          className="w-full object-cover aspect-[4/3] m-0 transition-transform duration-700 group-hover:scale-105"
+                          className="w-full h-full object-contain max-h-[300px] m-0 transition-transform duration-700 group-hover:scale-105"
                           referrerPolicy="no-referrer"
                         />
                         <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
@@ -408,7 +408,7 @@ export default function ProjectDetail() {
                         <img
                           src={`https://loremflickr.com/600/400/interior?lock=${project.id}8`}
                           alt="Material detail 2"
-                          className="w-full object-cover aspect-[4/3] m-0 transition-transform duration-700 group-hover:scale-105"
+                          className="w-full h-full object-contain max-h-[300px] m-0 transition-transform duration-700 group-hover:scale-105"
                           referrerPolicy="no-referrer"
                         />
                         <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>

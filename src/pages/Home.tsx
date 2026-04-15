@@ -198,7 +198,7 @@ export default function Home() {
                     duration: 0.5,
                     delay: Math.min(index * 0.1, 0.3),
                   }}
-                  className="group relative overflow-hidden rounded-2xl aspect-[4/5] cursor-pointer bg-[var(--color-beige)]"
+                  className="group relative overflow-hidden rounded-2xl max-h-[600px] cursor-pointer bg-[var(--color-beige)] flex items-center justify-center"
                 >
                   <Link to={`/projects/${project.id}`}>
                     <img
@@ -208,7 +208,7 @@ export default function Home() {
                       }
                       alt={project.name}
                       loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                       referrerPolicy="no-referrer"
                     />
                     <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none z-10">
@@ -289,11 +289,11 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative max-h-[400px] rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center bg-[var(--color-beige)]">
               <img
                 src="https://picsum.photos/seed/video/1280/720"
                 alt="Video Thumbnail"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
